@@ -1,0 +1,23 @@
+{
+  "logger": {
+    "title": "Remote Sync"
+  },
+  "uploadOnSave": true,
+  "useAtomicWrites": false,
+  "deleteLocal": false,
+  "hostname": "homework.cs.tufts.edu",
+  "target": "/h/zxue03/COMP40",
+
+  "ignore": [
+    ".remote-sync.json",
+    "./HW6-UM/.git/**",
+    ".git/**",
+    "*.o",
+    ".gitignore"
+  ],
+
+  "username": "zxue03",
+  "password": "Zhanghao521.",
+  "watch": [],
+  "transport": "scp"
+}
