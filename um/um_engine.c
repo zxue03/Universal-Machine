@@ -5,30 +5,22 @@
 *   This class implements the functions of um_engine, which handles starting
 *   a um machine, executing the instructions, and freeing all relevant memory
 */
+
 #include "um_engine.h"
+#include "um_operations.h"
+#include "um_struct.h"
 
 /*
 * Constant declarations
 */
 #define NUM_REGISTERS 8;
-#define SEGMENT_HINT 65536
+#define SEGMENT_HINT 65536;
 
 /*
 * Function declarations
 */
 struct UM intialize_um();
 void free_um(UM um_instance);
-
-/*
-* UM struct that represents the registers and segments of the simulated UM
-*/
-typedef struct UM {
-    uint32_t registers[NUM_REGISTERS];
-    uint32_t counter;
-    Seq_T mapped;
-    Seq_T unmapped;
-
-} *UM;
 
 /*
 * Um_opcode enum that standardizes the instruction operation codes
