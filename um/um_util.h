@@ -34,7 +34,16 @@ typedef struct UM {
     uint32_t counter;
     Seq_T mapped;
     Seq_T unmapped;
-    Seq_T instructions; /* aka segment 0 */
 } *UM;
+
+/*
+* Segment struct that represents a mapped segment
+*/
+typedef struct Segment {
+    uint32_t length;
+    uint32_t *words;
+} *Segment;
+
+// TODO: delete_segment
 
 #endif
