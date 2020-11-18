@@ -34,7 +34,7 @@ typedef struct UM {
     uint32_t counter;
     Seq_T mapped;
     Seq_T unmapped;
-    Seq_T instructions; // aka segment 0
+    Seq_T instructions; /* aka segment 0 */
 } *UM;
 
 #endif
