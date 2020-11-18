@@ -8,7 +8,7 @@
 
 #include "um_engine.h"
 #include "um_operations.h"
-#include "um_struct.h"
+#include "um_util.h"
 
 /*
 * Constant declarations
@@ -21,21 +21,6 @@
 */
 struct UM intialize_um();
 void free_um(UM um_instance);
-
-/*
-* Um_opcode enum that standardizes the instruction operation codes
-*/
-typedef enum Um_opcode {
-        CMOV = 0, SLOAD, SSTORE, ADD, MUL, DIV,
-        NAND, HALT, ACTIVATE, INACTIVATE, OUT, IN, LOADP, LV
-} Um_opcode;
-
-/*
-* Um_register enum that standardizes the register names
-*/
-typedef enum Um_register {
-    r0 = 0, r1, r2, r3, r4, r5, r6, r7
-} Um_register;
 
 /*
 * intialize_um
