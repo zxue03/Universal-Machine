@@ -9,6 +9,7 @@
 #define UM_UTIL_INCLUDED
 
 #define UM_WORD_WIDTH 32
+#define MAX_VAL 4294967296
 
 /*
 * Um_opcode enum that standardizes the instruction operation codes
@@ -29,7 +30,7 @@ typedef enum Um_register {
 * UM struct that represents the registers and segments of the simulated UM
 */
 typedef struct UM {
-    uint32_t registers[NUM_REGISTERS];
+    uint32_t registers [NUM_REGISTERS];
     uint32_t counter;
     Seq_T mapped;
     Seq_T unmapped;
