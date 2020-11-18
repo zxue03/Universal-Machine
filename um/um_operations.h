@@ -116,14 +116,14 @@ void op_bitwise_NAND(UM um, Um_register ra, Um_resigter rb, Um_register rc);
 * Stops the UM
 * Arguments:
 *   - um - the UM struct with all register and segment information
-* Return: void
+* Return: 0
 */
-void op_halt(UM um);
+int op_halt();
 
 /*
 * op_map_segment
 * Performs the map_segment operation
-* Creates a new segment with the number of words euqal to the value in rc
+* Creates a new segment with the number of words equal to the value in rc
 * puts the identifier in rb
 * Arguments:
 *   - um - the UM struct with all register and segment information
@@ -181,12 +181,14 @@ void op_load_program(UM um, Um_register rb, Um_register rc);
 
 /*
 * op_load_value
-*
+* performs the load_value operation
+* loads the value in ra
 * Arguments:
 *   - um - the UM struct with all register and segment information
 *   - ra - the Um_register to interpret as ra
+*   - value - the value you want to load
 * Return: void
 */
-void op_load_value(UM um, Um_register ra, );
+void op_load_value(UM um, Um_register ra, uint32_t value);
 
 #endif
