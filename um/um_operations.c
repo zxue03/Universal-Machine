@@ -18,7 +18,7 @@
 *   - rc - the Um_register to interpret as rc
 * Return: void
 */
-void op_conditional_move(UM um, Um_register ra, Um_resigter rb,
+void op_conditional_move(UM um, Um_register ra, Um_register rb,
                                                             Um_register rc)
 {
     if (um->registers[rc] != 0) {
@@ -37,7 +37,7 @@ void op_conditional_move(UM um, Um_register ra, Um_resigter rb,
 *   - rc - the Um_register to interpret as rc
 * Return: void
 */
-void op_segmented_load(UM um, Um_register ra, Um_resigter rb, Um_register rc)
+void op_segmented_load(UM um, Um_register ra, Um_register rb, Um_register rc)
 {
     // Retrieve the segment
     Segment segment = (Segment) Seq_get(um->mapped, um->registers[rb]);
@@ -58,7 +58,7 @@ void op_segmented_load(UM um, Um_register ra, Um_resigter rb, Um_register rc)
 *   - rc - the Um_register to interpret as rc
 * Return: void
 */
-void op_segmented_store(UM um, Um_register ra, Um_resigter rb, Um_register rc)
+void op_segmented_store(UM um, Um_register ra, Um_register rb, Um_register rc)
 {
     // Retrieve the segment
     Segment segment = (Segment) Seq_get(um->mapped, um->registers[ra]);
@@ -79,7 +79,7 @@ void op_segmented_store(UM um, Um_register ra, Um_resigter rb, Um_register rc)
 *   - rc - the Um_register to interpret as rc
 * Return: void
 */
-void op_addition(UM um, Um_register ra, Um_resigter rb, Um_register rc)
+void op_addition(UM um, Um_register ra, Um_register rb, Um_register rc)
 {
     um->registers[ra] = (um->registers[rb] + um->registers[rc]) % MAX_VAL;
 }
@@ -95,7 +95,7 @@ void op_addition(UM um, Um_register ra, Um_resigter rb, Um_register rc)
 *   - rc - the Um_register to interpret as rc
 * Return: void
 */
-void op_multiplication(UM um, Um_register ra, Um_resigter rb, Um_register rc)
+void op_multiplication(UM um, Um_register ra, Um_register rb, Um_register rc)
 {
       um->registers[ra] = (um->registers[rb] * um->registers[rc]) % MAX_VAL;
 }
@@ -111,7 +111,7 @@ void op_multiplication(UM um, Um_register ra, Um_resigter rb, Um_register rc)
 *   - rc - the Um_register to interpret as rc
 * Return: void
 */
-void op_division(UM um, Um_register ra, Um_resigter rb, Um_register rc)
+void op_division(UM um, Um_register ra, Um_register rb, Um_register rc)
 {
       um->registers[ra] = um->registers[rb] / um->registers[rc];
 }
@@ -127,7 +127,7 @@ void op_division(UM um, Um_register ra, Um_resigter rb, Um_register rc)
 *   - rc - the Um_register to interpret as rc
 * Return: void
 */
-void op_bitwise_NAND(UM um, Um_register ra, Um_resigter rb, Um_register rc)
+void op_bitwise_NAND(UM um, Um_register ra, Um_register rb, Um_register rc)
 {
       um->registers[ra] = ~(um->registers[rb] & um->registers[rc]);
 }
@@ -194,13 +194,13 @@ void op_map_segment(UM um, Um_register rb, Um_register rc)
 void op_unmap_segment(UM um, Um_register rc)
 {
     // Free the segment memory
-    Segment segment = (Segment) Seq_get(um->mapped, um->registers[rc]));
+    Segment segment = (Segment) Seq_get(um->mapped, um->registers[rc]);
     free(segment->words);
-    segments->length = 0;
-    segments->words = NULL;
+    segment->length = 0;
+    segment->words = NULL;
 
     // Add the id to unmapped
-    Seq_addhi(um->unmapped, um->registers[rc]);
+    Seq_addhi(um->unmapped, (void *)(uintptr_t)um->registers[rc]);
 }
 
 /*
@@ -260,8 +260,8 @@ void op_load_program(UM um, Um_register rb, Um_register rc)
     instructions_segment->words = new_words;
 
     // Copy words in the segment
-    words_to_copy = load_from->words;
-    for (int i = 0; i < instructions_segment->length; i++)  {
+    uint32_t *words_to_copy = load_from->words;
+    for (uint32_t i = 0; i < instructions_segment->length; i++)  {
         new_words[i] = words_to_copy[i];
     }
 

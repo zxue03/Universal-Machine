@@ -16,8 +16,6 @@
 
 #include "um_util.h"
 
-extern UM;
-
 /*
 * op_conditional_move
 * Performs the conditional move operation
@@ -29,7 +27,7 @@ extern UM;
 *   - rc - the Um_register to interpret as rc
 * Return: void
 */
-void op_conditional_move(UM um, Um_register ra, Um_resigter rb,
+void op_conditional_move(UM um, Um_register ra, Um_register rb,
                                                             Um_register rc);
 
 /*
@@ -43,7 +41,7 @@ void op_conditional_move(UM um, Um_register ra, Um_resigter rb,
 *   - rc - the Um_register to interpret as rc
 * Return: void
 */
-void op_segmented_load(UM um, Um_register ra, Um_resigter rb, Um_register rc);
+void op_segmented_load(UM um, Um_register ra, Um_register rb, Um_register rc);
 
 /*
 * op_segmented_store
@@ -56,7 +54,7 @@ void op_segmented_load(UM um, Um_register ra, Um_resigter rb, Um_register rc);
 *   - rc - the Um_register to interpret as rc
 * Return: void
 */
-void op_segmented_store(UM um, Um_register ra, Um_resigter rb, Um_register rc);
+void op_segmented_store(UM um, Um_register ra, Um_register rb, Um_register rc);
 
 /*
 * op_addtion
@@ -69,7 +67,7 @@ void op_segmented_store(UM um, Um_register ra, Um_resigter rb, Um_register rc);
 *   - rc - the Um_register to interpret as rc
 * Return: void
 */
-void op_addition(UM um, Um_register ra, Um_resigter rb, Um_register rc);
+void op_addition(UM um, Um_register ra, Um_register rb, Um_register rc);
 
 /*
 * op_multiplication
@@ -82,7 +80,7 @@ void op_addition(UM um, Um_register ra, Um_resigter rb, Um_register rc);
 *   - rc - the Um_register to interpret as rc
 * Return: void
 */
-void op_multiplication(UM um, Um_register ra, Um_resigter rb, Um_register rc);
+void op_multiplication(UM um, Um_register ra, Um_register rb, Um_register rc);
 
 /*
 * op_division
@@ -95,7 +93,7 @@ void op_multiplication(UM um, Um_register ra, Um_resigter rb, Um_register rc);
 *   - rc - the Um_register to interpret as rc
 * Return: void
 */
-void op_division(UM um, Um_register ra, Um_resigter rb, Um_register rc);
+void op_division(UM um, Um_register ra, Um_register rb, Um_register rc);
 
 /*
 * op_bitwise_NAND
@@ -108,7 +106,7 @@ void op_division(UM um, Um_register ra, Um_resigter rb, Um_register rc);
 *   - rc - the Um_register to interpret as rc
 * Return: void
 */
-void op_bitwise_NAND(UM um, Um_register ra, Um_resigter rb, Um_register rc);
+void op_bitwise_NAND(UM um, Um_register ra, Um_register rb, Um_register rc);
 
 /*
 * op_halt

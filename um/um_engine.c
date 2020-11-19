@@ -13,13 +13,12 @@
 /*
 * Constant declarations
 */
-#define NUM_REGISTERS 8;
-#define SEGMENT_HINT 65536;
+#define SEGMENT_HINT 65536
 
 /*
 * Function declarations
 */
-struct UM intialize_um();
+UM intialize_um();
 void free_um(UM um_instance);
 
 /*
@@ -29,7 +28,7 @@ void free_um(UM um_instance);
 * Arguments: None
 * Return: the newly malloc'd UM struct
 */
-struct UM intialize_um() {
+UM intialize_um() {
 
     // Malloc the struct
     UM um_instance = malloc(sizeof(struct UM));

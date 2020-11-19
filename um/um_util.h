@@ -10,6 +10,7 @@
 
 #define UM_WORD_WIDTH 32
 #define MAX_VAL 4294967296
+#define NUM_REGISTERS 8
 
 /*
 * Um_opcode enum that standardizes the instruction operation codes
