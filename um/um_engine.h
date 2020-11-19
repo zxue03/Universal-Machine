@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <seq.h>
 #include <assert.h>
 #include <bitpack.h>
