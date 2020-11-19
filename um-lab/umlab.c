@@ -69,9 +69,12 @@ void build_verbose_halt_test(Seq_T stream)
 
 void build_addition_test(Seq_T stream)
 {
-      Um_register a = r1;
-      Um_register b = r2;
-      Um_register c = r3;
-      append(stream, addition(a, b, c));
+      // append(stream, loadval(r1, 'a'));
+      append(stream, loadval(r2, '!'));
+      append(stream, loadval(r3, 'B'));
+      append(stream, addition(r1, r2, r3));
+      append(stream, output(r1));
+      append(stream, output(r2));
+      append(stream, output(r3));
       append(stream, halt());
 }

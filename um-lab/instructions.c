@@ -72,9 +72,9 @@ Um_instruction load_program(Um_register b, Um_register c)
 Um_instruction three_register(Um_opcode op, Um_register a, Um_register b, Um_register c)
 {
   Um_instruction word = 0;
-  word = Bitpack_newu(word, 3, 0, a);
+  word = Bitpack_newu(word, 3, 0, c);
   word = Bitpack_newu(word, 3, 3, b);
-  word = Bitpack_newu(word, 3, 6, c);
+  word = Bitpack_newu(word, 3, 6, a);
   word = Bitpack_newu(word, 4, 28, op);
   return word;
 }
@@ -82,7 +82,7 @@ Um_instruction three_register(Um_opcode op, Um_register a, Um_register b, Um_reg
 Um_instruction loadval(Um_register a, unsigned val) {
   Um_instruction word = 0;
   word = Bitpack_newu(word, 25, 0, val);
-  word = Bitpack_newu(word, 25, 3, a);
-  word = Bitpack_newu(word, 28, 4, LV);
+  word = Bitpack_newu(word, 3, 25, a);
+  word = Bitpack_newu(word, 4, 28, LV);
   return word;
 }
