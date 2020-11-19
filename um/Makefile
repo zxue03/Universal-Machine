@@ -1,8 +1,8 @@
-# Makefile for arith (Comp 40 Assignment 4)
+# Makefile for UM (Comp 40 Assignment 6)
 # Authors: COMP-40 Staff
-# Edited by: Louis Xue and Kevin Gao on 2020-10-18
+# Edited by: Louis Xue and Kevin Gao on 2020-11-18
 #
-# Includes build rules for 40image
+# Includes build rules for UM
 
 ############## Variables ###############
 
@@ -31,7 +31,7 @@ LDFLAGS = -g -L/comp/40/build/lib -L/usr/sup/cii40/lib64
 # All programs cii40 (Hanson binaries) and *may* need -lm (math)
 # 40locality is a catch-all for this assignment, netpbm is needed for pnm
 # rt is for the "real time" timing library, which contains the clock support
-LDLIBS = -lcii40 -lm -lrt -lbitpack
+LDLIBS = -lcii40 -lm -lrt -l40locality -larith40 -lbitpack
 
 # Collect all .h files in your directory.
 # This way, you can never forget to add
@@ -58,7 +58,10 @@ all: um
 um: um.o um_engine.o um_operations.o
 	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 
-op: operation_unit_testing.o um_operations.o
+engine: um_engine.o
+	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
+
+op: um_operations.o
 	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 
 clean:

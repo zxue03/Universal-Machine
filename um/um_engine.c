@@ -18,7 +18,7 @@
 /*
 * Function declarations
 */
-UM intialize_um ();
+UM initialize_um ();
 void free_um (UM um_instance);
 void read_instructions (UM um, FILE *fp);
 void execute_instructions (UM um);
@@ -40,7 +40,7 @@ void run_um (FILE *file) {
     read_instructions(um_instance, file);
 
     // Loop through execution
-    execute_instructions(um);
+    execute_instructions(um_instance);
 
     // Free the UM emulator
     free_um(um_instance);
@@ -53,7 +53,7 @@ void run_um (FILE *file) {
 * Arguments: None
 * Return: the newly malloc'd UM struct
 */
-UM intialize_um () {
+UM initialize_um () {
 
     // Malloc the struct
     UM um_instance = malloc(sizeof(struct UM));
@@ -128,7 +128,7 @@ void read_instructions (UM um, FILE *fp) {
         if (c == -1) {
             break;
         } else {
-            ungetc(char(c), fp);
+            ungetc((char)(c), fp);
         }
         // Read and bitpack the word
         Um_instruction word = 0;
@@ -147,10 +147,14 @@ void read_instructions (UM um, FILE *fp) {
     uint32_t *words = malloc(sizeof(uint32_t) * segment0->length);
     segment0->words = words;
 
+
     // Copy the values in the sequence to the words array
     for (uint32_t i = 0; i < segment0->length; i++) {
         words[i] = (uint32_t)(uintptr_t)Seq_get(instructions, i);
     }
+
+    // Store segment as m[0]
+    Seq_addhi(um->mapped, (void *) segment0);
 
     Seq_free(&instructions);
 }
@@ -178,32 +182,32 @@ void execute_instructions (UM um) {
         int opcode = Bitpack_getu(cur_instruction, 4, 28);
 
         // Retrieve the corresponding registers used
-        Um_register ra = NULL;
-        Um_register rb = NULL;
-        Um_register rc = NULL;
+        Um_register registers[8] = {r0, r1, r2, r3, r4, r5, r6, r7};
+        Um_register ra;
+        Um_register rb;
+        Um_register rc;
 
         // Regular three_register instructions
         if (opcode != LV) {
-            Um_register registers[8] = {r0, r1, r2, r3, r4, r5, r6, r7};
             int ra_bits = Bitpack_getu(cur_instruction, 3, 6);
             int rb_bits = Bitpack_getu(cur_instruction, 3, 3);
             int rc_bits = Bitpack_getu(cur_instruction, 3, 0);
 
             // Match the bits of the word to their respective registers
             if (0 <= ra_bits && ra_bits <= 7) {
-                Um_register ra = registers[ra_bits];
+                ra = registers[ra_bits];
             }
             if (0 <= rb_bits && rb_bits <= 7) {
-                Um_register rb = registers[rb_bits];
+                rb = registers[rb_bits];
             }
             if (0 <= rc_bits && rc_bits <= 7) {
-                Um_register rc = registers[rc_bits];
+                rc = registers[rc_bits];
             }
             // Different location for ra in the load value operation
         } else {
             int ra_bits = Bitpack_getu(cur_instruction, 3, 25);
             if (0 <= ra_bits && ra_bits <= 7) {
-                Um_register ra = registers[ra_bits];
+                ra = registers[ra_bits];
             }
         }
 
@@ -215,7 +219,7 @@ void execute_instructions (UM um) {
         } else if (opcode == SSTORE) {
             op_segmented_store(um, ra, rb, rc);
         } else if (opcode == ADD) {
-            op_addtion(um, ra, rb, rc);
+            op_addition(um, ra, rb, rc);
         } else if (opcode == MUL) {
             op_multiplication(um, ra, rb, rc);
         } else if (opcode == DIV) {
@@ -239,6 +243,6 @@ void execute_instructions (UM um) {
             uint32_t value = Bitpack_getu(cur_instruction, 25, 0);
             op_load_value(um, ra, value);
         }
-        counter++;
+        um->counter++;
     }
 }

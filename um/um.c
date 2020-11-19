@@ -8,6 +8,7 @@
 
 #include "um_engine.h"
 #include <assert.h>
+
 int main(int argc, char **argv)
 {
     // Open the file
@@ -15,7 +16,7 @@ int main(int argc, char **argv)
         fprintf(stderr, "Usage: ./um [um instruction file]");
         exit(EXIT_FAILURE);
     }
-    FILE *fp = fopen(argv[1]);
+    FILE *fp = fopen(argv[1], "r");
     if (fp == NULL) {
         fprintf(stderr, "Specified um instruction file does not exist.");
         exit(EXIT_FAILURE);

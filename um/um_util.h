@@ -12,6 +12,8 @@
 #define MAX_VAL 4294967296
 #define NUM_REGISTERS 8
 
+typedef uint32_t Um_instruction;
+
 /*
 * Um_opcode enum that standardizes the instruction operation codes
 */
