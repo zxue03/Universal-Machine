@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <seq.h>
 #include <assert.h>
-#include <bitpack.h>
+#include <inttypes.h>
 
 #include "um_util.h"
 
