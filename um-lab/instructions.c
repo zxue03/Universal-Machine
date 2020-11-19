@@ -83,6 +83,6 @@ Um_instruction loadval(Um_register a, unsigned val) {
   Um_instruction word = 0;
   word = Bitpack_newu(word, 25, 0, val);
   word = Bitpack_newu(word, 25, 3, a);
-  word = Bitpack_newu(word, 28, 4, 13);
+  word = Bitpack_newu(word, 28, 4, LV);
   return word;
 }

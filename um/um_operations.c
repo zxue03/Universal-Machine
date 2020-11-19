@@ -40,7 +40,7 @@ void op_conditional_move(UM um, Um_register ra, Um_resigter rb,
 void op_segmented_load(UM um, Um_register ra, Um_resigter rb, Um_register rc)
 {
     // Retrieve the segment
-    Segment segment = *((Segment *) Seq_get(um->mapped, um->registers[rb]));
+    Segment segment = (Segment) Seq_get(um->mapped, um->registers[rb]);
     uint32_t *words = segment->words;
 
     // Load the specified value into ra
@@ -61,7 +61,7 @@ void op_segmented_load(UM um, Um_register ra, Um_resigter rb, Um_register rc)
 void op_segmented_store(UM um, Um_register ra, Um_resigter rb, Um_register rc)
 {
     // Retrieve the segment
-    Segment segment = *((Segment *) Seq_get(um->mapped, um->registers[ra]));
+    Segment segment = (Segment) Seq_get(um->mapped, um->registers[ra]);
     uint32_t *words = segment->words;
 
     // Store the specific value
@@ -168,12 +168,12 @@ void op_map_segment(UM um, Um_register rb, Um_register rc)
     uint32_t id;
     if (Seq_length(um->unmapped) > 0){
         id = (uint32_t)(uintptr_t)Seq_remlo(um->unmapped);
-        updated_segment = *(Segment *)Seq_get(um->mapped, id);
+        updated_segment = (Segment) Seq_get(um->mapped, id);
     } else {
-        Segment updated_segment = malloc(sizeof(*new_segment));
+        updated_segment = malloc(sizeof(*updated_segment));
         assert(updated_segment != NULL);
         id = Seq_length(um->mapped);
-        Seq_addhi(um->mapped, &updated_segment);
+        Seq_addhi(um->mapped, (void *) updated_segment);
     }
     updated_segment->length = um->registers[rc];
     updated_segment->words = real_memory;
@@ -194,7 +194,7 @@ void op_map_segment(UM um, Um_register rb, Um_register rc)
 void op_unmap_segment(UM um, Um_register rc)
 {
     // Free the segment memory
-    Segment segment = *( (Segment *) Seq_get(um->mapped, um->registers[rc]));
+    Segment segment = (Segment) Seq_get(um->mapped, um->registers[rc]));
     free(segment->words);
     segments->length = 0;
     segments->words = NULL;
@@ -248,11 +248,11 @@ void op_input(UM um, Um_register rc)
 void op_load_program(UM um, Um_register rb, Um_register rc)
 {
     // Retrieve the instructions segment
-    Segment instructions_segment = *(Segment *) Seq_get(um->mapped, 0);
+    Segment instructions_segment = (Segment) Seq_get(um->mapped, 0);
     free(instructions_segment->words);
 
     // Retrieve the segment to duplicate
-    Segment load_from = *(Segment *) Seq_get(um->mapped, um->registers[rb]);
+    Segment load_from = (Segment) Seq_get(um->mapped, um->registers[rb]);
 
     // Create new words segment
     uint32_t *new_words = malloc(load_from->length * sizeof(uint32_t));
