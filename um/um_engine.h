@@ -13,7 +13,8 @@
 #include <stdlib.h>
 #include <seq.h>
 #include <assert.h>
+#include <bitpack.h>
 
-void run_um();
+void run_um (FILE *file);
 
 #endif
