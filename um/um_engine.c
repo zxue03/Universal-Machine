@@ -173,7 +173,7 @@ void execute_instructions (UM um) {
     uint32_t *instructions = instruction_segment->words;
 
     // Loop through each instruction
-    while (um->counter < instruction_segment->length) {
+    while (true) {
 
         // Retrieve the current instruction
         uint32_t cur_instruction = instructions[um->counter];
@@ -227,7 +227,9 @@ void execute_instructions (UM um) {
         } else if (opcode == NAND) {
             op_bitwise_NAND(um, ra, rb, rc);
         } else if (opcode == HALT) {
-            op_halt();
+            if (op_halt() == 0) {
+                break;
+            }
         } else if (opcode == ACTIVATE) {
             op_map_segment(um, rb, rc);
         } else if (opcode == INACTIVATE) {
