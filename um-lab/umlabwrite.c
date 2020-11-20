@@ -24,7 +24,7 @@ static struct test_info {
 } tests[] = {
         { "halt",         NULL, "", build_halt_test },
         { "halt-verbose", NULL, "", build_verbose_halt_test },
-        { "addition", NULL, "", build_addition_test }
+        { "addition", NULL, "6", build_addition_test }
 };
 
 

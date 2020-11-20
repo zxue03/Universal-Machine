@@ -70,11 +70,9 @@ void build_verbose_halt_test(Seq_T stream)
 void build_addition_test(Seq_T stream)
 {
       // append(stream, loadval(r1, 'a'));
-      append(stream, loadval(r2, '!'));
-      append(stream, loadval(r3, 'B'));
-      append(stream, addition(r1, r2, r3));
-      append(stream, output(r1));
-      append(stream, output(r2));
+      append(stream, loadval(r1, 48));
+      append(stream, loadval(r2, 6));
+      append(stream, addition(r3, r1, r2));
       append(stream, output(r3));
       append(stream, halt());
 }
