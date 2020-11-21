@@ -34,5 +34,8 @@ engine: um_engine.o
 op: um_operations.o
 	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 
+writetests: umlabwrite.o umlab.o instructions.o
+	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
+
 clean:
-	rm -f um op *.o
+	rm -f um op *.o *.um
