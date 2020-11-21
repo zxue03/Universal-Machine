@@ -17,6 +17,7 @@ extern void build_division_test(Seq_T stream);
 extern void build_nand_test(Seq_T stream);
 extern void build_input_test(Seq_T stream);
 extern void build_move_test(Seq_T stream);
+extern void build_no_halt_test(Seq_T stream);
 
 /* The array `tests` contains all unit tests for the lab. */
 
