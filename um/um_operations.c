@@ -162,6 +162,11 @@ void op_map_segment(UM um, Um_register rb, Um_register rc)
     uint32_t *real_memory = malloc(sizeof(uint32_t) * um->registers[rc]);
     assert(real_memory != NULL);
 
+    // Initialize each word to 0
+    for (uint32_t i = 0; i < um->registers[rc]; i++) {
+        real_memory[i] = 0;
+    }
+
     Segment updated_segment;
 
     // Assign to the lowest free index in mapped
