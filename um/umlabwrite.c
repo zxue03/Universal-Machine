@@ -19,6 +19,7 @@ extern void build_input_test(Seq_T stream);
 extern void build_move_test(Seq_T stream);
 extern void build_no_halt_test(Seq_T stream);
 extern void build_map_segment_test_1(Seq_T stream);
+extern void build_unmap_segment_test_1(Seq_T stream);
 
 /* The array `tests` contains all unit tests for the lab. */
 
@@ -38,7 +39,8 @@ static struct test_info {
         { "conditional_move", NULL, "PPM", build_move_test },
         { "input", "PNM", "PNM", build_input_test },
         { "no_halt", NULL, "", build_no_halt_test },
-        { "map_segment_1", NULL, "", build_map_segment_test_1 }
+        { "map_segment_1", NULL, "", build_map_segment_test_1 },
+        { "unmap_segment_1", NULL, "", build_unmap_segment_test_1 }
 };
 
 

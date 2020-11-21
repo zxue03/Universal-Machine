@@ -11,10 +11,10 @@ Unit Tested:
 - Output
 - Input
 - Load Value
+- Map Segment
+- Unmap Segment
 
 Yet to be tested:
 - Segmented Load
 - Segmented Store
-- Map Segment
-- Unmap Segment
 - Load Program
