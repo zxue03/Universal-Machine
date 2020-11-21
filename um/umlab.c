@@ -141,3 +141,16 @@ void build_no_halt_test(Seq_T stream)
 {
     append(stream, loadval(r4, 22));
 }
+
+void build_map_segment_test_1(Seq_T stream)
+{
+    append(stream, loadval(r1, 77));
+    append(stream, loadval(r3, 80));
+    append(stream, output(r1));
+    append(stream, output(r3));
+    append(stream, map_segment(r2, r1));
+    append(stream, map_segment(r4, r3));
+    append(stream, output(r2));
+    append(stream, output(r4));
+    append(stream, halt());
+}

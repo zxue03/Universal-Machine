@@ -18,6 +18,7 @@ extern void build_nand_test(Seq_T stream);
 extern void build_input_test(Seq_T stream);
 extern void build_move_test(Seq_T stream);
 extern void build_no_halt_test(Seq_T stream);
+extern void build_map_segment_test_1(Seq_T stream);
 
 /* The array `tests` contains all unit tests for the lab. */
 
@@ -36,7 +37,8 @@ static struct test_info {
         { "NAND", NULL, "!", build_nand_test },
         { "conditional_move", NULL, "PPM", build_move_test },
         { "input", "PNM", "PNM", build_input_test },
-        { "no_halt", NULL, "", build_no_halt_test }
+        { "no_halt", NULL, "", build_no_halt_test },
+        { "map_segment_1", NULL, "", build_map_segment_test_1 }
 };
 
 
