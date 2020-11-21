@@ -136,3 +136,8 @@ void build_input_test(Seq_T stream)
     append(stream, output(r3));
     append(stream, halt());
 }
+
+void build_no_halt_test(Seq_T stream)
+{
+    append(stream, loadval(r4, 22));
+}
