@@ -24,4 +24,7 @@ int main(int argc, char **argv)
 
     // Create and run a UM emulator
     run_um(fp);
+
+    // Close the file
+    fclose(fp);
 }
