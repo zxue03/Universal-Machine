@@ -77,39 +77,6 @@ UM initialize_um () {
 }
 
 /*
-* free_um
-* Private helper function that frees all dynamically allocated memory
-* associated with the given UM struct
-* Arguemnts:
-*   - um_instance - the UM to free
-* Return: void
-*/
-void free_um (UM um_instance) {
-
-    // Delete segments
-    size_t num_segments = Seq_length(um_instance->mapped);
-    for (size_t i = 0; i < num_segments; i++) {
-
-        // Free the all of the words in each segment
-        Segment segment = Seq_get(um_instance->mapped, i);
-        int num_words = segment->length;
-        if (num_words >= 1) {
-            free(segment->words);
-        }
-
-        // Free the segment struct itself
-        free(segment);
-    }
-
-    // Free struct fields
-    Seq_free(&(um_instance->mapped));
-    Seq_free(&(um_instance->unmapped));
-
-    // Delete UM struct
-    free(um_instance);
-}
-
-/*
 * read_instructions
 * Reads in the initial instructions of the program
 * Arguments:
@@ -247,4 +214,37 @@ void execute_instructions (UM um) {
         }
         um->counter++;
     }
+}
+
+/*
+* free_um
+* Private helper function that frees all dynamically allocated memory
+* associated with the given UM struct
+* Arguemnts:
+*   - um_instance - the UM to free
+* Return: void
+*/
+void free_um (UM um_instance) {
+
+    // Delete segments
+    size_t num_segments = Seq_length(um_instance->mapped);
+    for (size_t i = 0; i < num_segments; i++) {
+
+        // Free the all of the words in each segment
+        Segment segment = Seq_get(um_instance->mapped, i);
+        int num_words = segment->length;
+        if (num_words >= 1) {
+            free(segment->words);
+        }
+
+        // Free the segment struct itself
+        free(segment);
+    }
+
+    // Free struct fields
+    Seq_free(&(um_instance->mapped));
+    Seq_free(&(um_instance->unmapped));
+
+    // Delete UM struct
+    free(um_instance);
 }
