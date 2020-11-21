@@ -1,2 +1,20 @@
-Halt breaks out of the Loop
-Load program updates the number of instructions
+Map 0 segments
+Each word in a new segment maps to 0
+
+Unit Tested:
+- Conditional Move
+- Addition
+- Multiplication
+- Division
+- Bitwise NAND
+- Halt
+- Output
+- Input
+- Load Value
+
+Yet to be tested:
+- Segmented Load
+- Segmented Store
+- Map Segment
+- Unmap Segment
+- Load Program
