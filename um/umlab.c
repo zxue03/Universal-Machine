@@ -161,3 +161,27 @@ void build_unmap_segment_test_1(Seq_T stream)
     append(stream, unmap_segment(r4));
     append(stream, halt());
 }
+
+void build_segment_store_load_test_1(Seq_T stream)
+{
+    append(stream, loadval(r1, 77));
+    append(stream, loadval(r3, 80));
+    append(stream, map_segment(r2, r1));
+    append(stream, map_segment(r4, r3));
+
+    append(stream, loadval(r5, 83));
+    append(stream, loadval(r6, 0));
+    append(stream, loadval(r7, 79));
+    append(stream, segmented_store(r2, r6, r5));
+    append(stream, segmented_store(r4, r7, r7));
+
+    append(stream, segmented_load(r0, r4, r7));
+    append(stream, output(r0));
+
+    append(stream, segmented_load(r7, r2, r6));
+    append(stream, output(r7));
+
+    append(stream, unmap_segment(r2));
+    append(stream, unmap_segment(r4));
+    append(stream, halt());
+}

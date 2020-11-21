@@ -13,8 +13,8 @@ Unit Tested:
 - Load Value
 - Map Segment
 - Unmap Segment
-
-Yet to be tested:
 - Segmented Load
 - Segmented Store
+
+Yet to be tested:
 - Load Program
