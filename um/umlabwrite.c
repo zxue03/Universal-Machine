@@ -37,7 +37,7 @@ static struct test_info {
         { "addition", NULL, "6", build_addition_test },
         { "multiplication", NULL, "2", build_multiplication_test },
         { "division", NULL, "3", build_division_test },
-        { "NAND", NULL, "!", build_nand_test },
+        { "NAND", NULL, "2", build_nand_test },
         { "conditional_move", NULL, "PPM", build_move_test },
         { "input", "PNM", "PNM", build_input_test },
         { "no_halt", NULL, "", build_no_halt_test },

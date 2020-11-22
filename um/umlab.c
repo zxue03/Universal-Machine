@@ -97,12 +97,14 @@ void build_division_test(Seq_T stream)
 
 void build_nand_test(Seq_T stream)
 {
-    append(stream, loadval(r1, 33554421));
-    append(stream, loadval(r2, 33554428));
-    append(stream, bitwise_NAND(r3, r1, r2));
-    append(stream, loadval(r4, 22));
-    append(stream, addition(r3, r3, r4));
-    append(stream, output(r3));
+    append(stream, loadval(r1, 0));
+    append(stream, bitwise_NAND(r1, r1, r1));
+    append(stream, loadval(r2, 2));
+    append(stream, bitwise_NAND(r2, r2, r1));
+    append(stream, bitwise_NAND(r2, r2, r1));
+    append(stream, loadval(r3, 48));
+    append(stream, addition(r2, r2, r3));
+    append(stream, output(r2));
     append(stream, halt());
 }
 
