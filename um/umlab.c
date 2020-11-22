@@ -198,11 +198,7 @@ void build_load_program_test_1(Seq_T stream)
     append(stream, multiplication(r1, r1, r2));
     append(stream, loadval(r2, 2));
     append(stream, multiplication(r1, r1, r2));
-    // append(stream, output(r1));
     append(stream, bitwise_NAND(r1, r1, r1));
-
-    // append(stream, output(r1));
-    // append(stream, halt());
 
     // Add program to segment
     append(stream, loadval(r5, 1));
