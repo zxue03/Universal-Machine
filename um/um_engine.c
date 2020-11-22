@@ -114,7 +114,6 @@ void read_instructions (UM um, FILE *fp) {
     uint32_t *words = malloc(sizeof(uint32_t) * segment0->length);
     segment0->words = words;
 
-
     // Copy the values in the sequence to the words array
     for (uint32_t i = 0; i < segment0->length; i++) {
         words[i] = (uint32_t)(uintptr_t)Seq_get(instructions, i);
