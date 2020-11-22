@@ -252,6 +252,14 @@ void op_input(UM um, Um_register rc)
 */
 void op_load_program(UM um, Um_register rb, Um_register rc)
 {
+    // Set the instructions counter
+    um->counter = um->registers[rc];
+
+    // Check the loaded program is not m[0]
+    if (um->registers[rb] == 0) {
+        return;
+    }
+
     // Retrieve the instructions segment
     Segment instructions_segment = (Segment) Seq_get(um->mapped, 0);
     free(instructions_segment->words);
@@ -269,9 +277,6 @@ void op_load_program(UM um, Um_register rb, Um_register rc)
     for (uint32_t i = 0; i < instructions_segment->length; i++)  {
         new_words[i] = words_to_copy[i];
     }
-
-    // Set the instructions counter
-    um->counter = um->registers[rc];
 }
 
 /*
