@@ -105,6 +105,7 @@ void read_instructions (UM um, FILE *fp) {
         }
         Seq_addhi(instructions, (void *)(uintptr_t)word);
     }
+
     // Create segment representing the program
     Segment segment0 = malloc(sizeof(*segment0));
     assert(segment0 != NULL);

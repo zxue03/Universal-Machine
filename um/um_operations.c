@@ -5,6 +5,7 @@
 *   This class implements the functions of um_operations, which handle the
 *   execution of each operation instruction
 */
+
 #include "um_operations.h"
 
 /*

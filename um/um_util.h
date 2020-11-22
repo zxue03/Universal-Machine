@@ -5,6 +5,7 @@
 *   This class standardizes inter-module communication by specifying the
 *   structure of shared structs, enums, and constants
 */
+
 #ifndef UM_UTIL_INCLUDED
 #define UM_UTIL_INCLUDED
 

@@ -4,6 +4,11 @@ Correct register values on startup
 Check segment ids are reused
 Check that after loading a program, the previous segment still existsc
 
+Write unit instruction tests
+Comprehensive tests
+Clean code
+README
+
 Unit Tested:
 - Conditional Move
 - Addition

@@ -5,6 +5,7 @@
 *   This class declares the functions of um_operations, which handle the
 *   execution of each operation instruction
 */
+
 #ifndef UM_OPERATIONS_INCLUDED
 #define UM_OPERATIONS_INCLUDED
 
