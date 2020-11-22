@@ -95,7 +95,7 @@ void read_instructions (UM um, FILE *fp) {
         if (c == -1) {
             break;
         } else {
-            ungetc((char)(c), fp);
+            ungetc(c, fp);
         }
         // Read and bitpack the word
         Um_instruction word = 0;
