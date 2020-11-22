@@ -134,12 +134,12 @@ void read_instructions (UM um, FILE *fp) {
 */
 void execute_instructions (UM um) {
 
-    // Retrieve the segment and instructions
-    Segment instruction_segment = (Segment) Seq_get(um->mapped, 0);
-    uint32_t *instructions = instruction_segment->words;
-
     // Loop through each instruction
     while (true) {
+
+        // Retrieve the segment and instructions
+        Segment instruction_segment = (Segment) Seq_get(um->mapped, 0);
+        uint32_t *instructions = instruction_segment->words;
 
         // Retrieve the current instruction
         uint32_t cur_instruction = instructions[um->counter];
