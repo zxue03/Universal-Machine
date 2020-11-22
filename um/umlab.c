@@ -190,9 +190,6 @@ void build_segment_store_load_test_1(Seq_T stream)
 
 void build_load_program_test_1(Seq_T stream)
 {
-    // Load a value into r0
-    append(stream, loadval(r0, 90));
-
     // Create the program that prints r0 and halts
     append(stream, loadval(r1, 1));
     append(stream, loadval(r2, 1024));
@@ -201,7 +198,7 @@ void build_load_program_test_1(Seq_T stream)
     append(stream, multiplication(r1, r1, r2));
     append(stream, loadval(r2, 2));
     append(stream, multiplication(r1, r1, r2));
-    append(stream, output(r1));
+    // append(stream, output(r1));
     append(stream, bitwise_NAND(r1, r1, r1));
 
     // append(stream, output(r1));
