@@ -6,6 +6,8 @@ cd tests
 rm *.um
 rm *.0
 rm *.1
+rm *.rf
+rm *.mine
 cd ../
 mv *.um tests
 mv *.0 tests
