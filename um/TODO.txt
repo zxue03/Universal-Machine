@@ -10,6 +10,11 @@ Comprehensive tests
 Clean code
 README
 
+
+
+
+
+
 Unit Tested:
 - Conditional Move
 - Addition
@@ -24,6 +29,4 @@ Unit Tested:
 - Unmap Segment
 - Segmented Load
 - Segmented Store
-
-Yet to be tested:
 - Load Program
