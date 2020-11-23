@@ -15,7 +15,7 @@ INCLUDES = $(shell echo *.h)
 
 ############### Rules ###############
 
-all: um writetests
+all: clean um writetests
 
 ## Compile step (.c files -> .o files)
 
