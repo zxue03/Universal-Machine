@@ -26,6 +26,9 @@ extern void build_load_program_test_1(Seq_T stream);
 extern void map_0_segments(Seq_T stream);
 extern void map_and_umap_0_segments(Seq_T stream);
 extern void halt_from_load_program(Seq_T stream);
+extern void check_initial_register_values(Seq_T stream);
+extern void segment_words_initial_values(Seq_T stream);
+extern void segment_ids_reused(Seq_T stream);
 
 /* The array `tests` contains all unit tests for the lab. */
 
@@ -56,7 +59,10 @@ static struct test_info {
         // Stress Tests
         { "map_0_segments", NULL, "F", map_0_segments },
         { "map_and_umap_0_segments", NULL, "F", map_and_umap_0_segments },
-        { "halt_instruction_from_load_program", NULL, "F", halt_from_load_program}
+        { "halt_instruction_from_load_program", NULL, "F", halt_from_load_program},
+        // { "segment_ids_reused", NULL, "0", segment_ids_reused}
+        // { "segment_words_initial_values", NULL, "", segment_words_initial_values}
+        // { "initial_register_value_check", NULL, "0", check_initial_register_values}
 };
 
 

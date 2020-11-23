@@ -281,4 +281,55 @@ void halt_from_load_program(Seq_T stream)
 
     // Load the program that prints r0 and halts
     append(stream, load_program(r7, r6));
+    append(stream, halt());
+}
+
+// Stress Test: initial register values
+void check_initial_register_values(Seq_T stream)
+{
+    append(stream, output(r0));
+    append(stream, output(r1));
+    append(stream, output(r2));
+    append(stream, output(r3));
+    append(stream, output(r4));
+    append(stream, output(r5));
+    append(stream, output(r6));
+    append(stream, output(r7));
+    append(stream, loadval(r7, 48));
+    append(stream, output(r7));
+    append(stream, halt());
+}
+
+// Stress Test: segment words are all 0
+void segment_words_initial_values(Seq_T stream)
+{
+    append(stream, loadval(r1, 77));
+    append(stream, loadval(r3, 80));
+    append(stream, map_segment(r2, r1));
+    append(stream, map_segment(r4, r3));
+    append(stream, segmented_load(r0, r2, 0));
+    append(stream, segmented_load(r5, r2, 76));
+    append(stream, segmented_load(r6, r4, 79));
+    append(stream, segmented_load(r7, r4, 50));
+    append(stream, output(r0));
+    append(stream, output(r5));
+    append(stream, output(r6));
+    append(stream, output(r7));
+    append(stream, halt());
+}
+
+// Stress Test: segment ids are reused
+void segment_ids_reused(Seq_T stream)
+{
+    append(stream, loadval(r1, 77));
+    append(stream, loadval(r3, 80));
+    append(stream, map_segment(r2, r1));
+    append(stream, unmap_segment(r2));
+    append(stream, map_segment(r4, r3));
+    // append(stream, division(r7, r4, r2));
+    append(stream, addition(r2, r2, 48));
+    append(stream, output(r2));
+    append(stream, addition(r4, r4, 48));
+    append(stream, output(r4));
+    append(stream, halt());
 }
