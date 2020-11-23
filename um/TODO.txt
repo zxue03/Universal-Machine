@@ -1,19 +1,11 @@
-Map 0 segments
-Each word in a new segment maps to 0
-Correct register values on startup
-Check segment ids are reused
-Check that after loading a program, the previous segment still exists
-Directly edit instructions
+FINAL TODO:
+- Comprehensive tests
 
-Write unit instruction tests
-Comprehensive tests
-Clean code
-README
-
-
-
-
-
+- README
+    - some instruction tests are naturally done in pairs
+        - input/output
+        - store/load segment - so some unit tests will use 2 but never more
+          than 2 and never any unnecessary untested operations
 
 Unit Tested:
 - Conditional Move
@@ -30,3 +22,28 @@ Unit Tested:
 - Segmented Load
 - Segmented Store
 - Load Program
+
+Instruction Set Test Order:
+- Halt
+- Load Value / Output
+- Input
+- Conditional Move
+- Addition
+- Multiplication
+- Division
+- Bitwise NAND
+- Map Segment
+- Unmap Segment
+- Store Segment
+- Load Segment
+- Load Program
+
+Stress Tests:
+- Map 0 Segments
+- Append Halt instruction by load program
+
+- Each word in a new segment maps to 0
+- Correct register values on startup
+- Check segment ids are reused
+- Check that after loading a program, the previous segment still exists
+- Directly edit instructions
