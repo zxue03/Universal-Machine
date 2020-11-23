@@ -270,6 +270,8 @@ void op_load_program(UM um, Um_register rb, Um_register rc)
 
     // Create new words segment
     uint32_t *new_words = malloc(load_from->length * sizeof(uint32_t));
+    assert(new_words != NULL);
+
 
     // Copy words in the segment
     for (uint32_t i = 0; i < load_from->length; i++)  {

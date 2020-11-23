@@ -113,6 +113,7 @@ void read_instructions (UM um, FILE *fp) {
 
     // Create words array with length of sequence
     uint32_t *words = malloc(sizeof(uint32_t) * segment0->length);
+    assert(words != NULL);
     segment0->words = words;
 
     // Copy the values in the sequence to the words array
