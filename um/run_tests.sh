@@ -33,6 +33,7 @@ for testFile in $testFiles ; do
         echo ""
         echo "********ERROR********"
         echo "Diffing $testName.rf and $testName.mine failed."
+        echo "********ERROR********"
         echo ""
         allSucceed=0
     fi
@@ -43,6 +44,7 @@ for testFile in $testFiles ; do
             echo ""
             echo "********ERROR********"
             echo "Diffing $testName.rf and $testName.1 failed."
+            echo "********ERROR********"
             echo ""
             allSucceed=0
         fi
@@ -52,6 +54,7 @@ for testFile in $testFiles ; do
             echo ""
             echo "********ERROR********"
             echo "Diffing $testName.1 and $testName.mine failed."
+            echo "********ERROR********"
             echo ""
             allSucceed=0
         fi
