@@ -229,3 +229,56 @@ void build_load_program_test_1(Seq_T stream)
     // Load the program that prints r0 and halts
     append(stream, load_program(r7, r6));
 }
+
+// Stress Test: Map 0 segments
+void map_0_segments(Seq_T stream)
+{
+    append(stream, loadval(r4, 70));
+    append(stream, output(r4));
+    append(stream, loadval(r1, 77));
+    append(stream, loadval(r3, 0));
+    append(stream, map_segment(r2, r1));
+    append(stream, map_segment(r4, r3));
+    append(stream, halt());
+}
+
+// Stress Test: Map and Unmap 0 segments
+void map_and_umap_0_segments(Seq_T stream)
+{
+    append(stream, loadval(r4, 70));
+    append(stream, output(r4));
+    append(stream, loadval(r1, 77));
+    append(stream, loadval(r3, 0));
+    append(stream, map_segment(r2, r1));
+    append(stream, map_segment(r4, r3));
+    append(stream, unmap_segment(r2));
+    append(stream, unmap_segment(r4));
+    append(stream, halt());
+}
+
+// Stress Test: No halt in the program, but load it in
+void halt_from_load_program(Seq_T stream)
+{
+    // Do something a program would
+    append(stream, loadval(r4, 70));
+    append(stream, output(r4));
+
+    // Create the program that prints r0 and halts
+    append(stream, loadval(r1, 1));
+    append(stream, loadval(r2, 1024));
+    append(stream, multiplication(r1, r1, r2));
+    append(stream, multiplication(r1, r1, r2));
+    append(stream, multiplication(r1, r1, r2));
+    append(stream, loadval(r2, 2));
+    append(stream, multiplication(r1, r1, r2));
+    append(stream, bitwise_NAND(r1, r1, r1));
+
+    // Add program to segment
+    append(stream, loadval(r5, 1));
+    append(stream, loadval(r6, 0));
+    append(stream, map_segment(r7, r5));
+    append(stream, segmented_store(r7, r6, r1));
+
+    // Load the program that prints r0 and halts
+    append(stream, load_program(r7, r6));
+}

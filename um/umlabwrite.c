@@ -23,6 +23,9 @@ extern void build_map_segment_test_1(Seq_T stream);
 extern void build_unmap_segment_test_1(Seq_T stream);
 extern void build_segment_store_load_test_1(Seq_T stream);
 extern void build_load_program_test_1(Seq_T stream);
+extern void map_0_segments(Seq_T stream);
+extern void map_and_umap_0_segments(Seq_T stream);
+extern void halt_from_load_program(Seq_T stream);
 
 /* The array `tests` contains all unit tests for the lab. */
 
@@ -48,7 +51,12 @@ static struct test_info {
         { "map_segment", NULL, "", build_map_segment_test_1 },
         { "unmap_segment", NULL, "", build_unmap_segment_test_1 },
         { "load_store_segment", NULL, "OS", build_segment_store_load_test_1 },
-        { "load_program", NULL, "", build_load_program_test_1 }
+        { "load_program", NULL, "", build_load_program_test_1 },
+
+        // Stress Tests
+        { "map_0_segments", NULL, "F", map_0_segments },
+        { "map_and_umap_0_segments", NULL, "F", map_and_umap_0_segments },
+        { "halt_instruction_from_load_program", NULL, "F", halt_from_load_program}
 };
 
 
