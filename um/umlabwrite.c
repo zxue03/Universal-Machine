@@ -9,15 +9,16 @@
 
 extern void Um_write_sequence(FILE *output, Seq_T instructions);
 
-extern void build_halt_test(Seq_T instructions);
 extern void build_verbose_halt_test(Seq_T instructions);
+
+extern void build_halt_test(Seq_T instructions);
+extern void build_load_value_output_test(Seq_T instructions);
+extern void build_input_test(Seq_T stream);
+extern void build_move_test(Seq_T stream);
 extern void build_addition_test(Seq_T instructions);
 extern void build_multiplication_test(Seq_T stream);
 extern void build_division_test(Seq_T stream);
 extern void build_nand_test(Seq_T stream);
-extern void build_input_test(Seq_T stream);
-extern void build_move_test(Seq_T stream);
-extern void build_no_halt_test(Seq_T stream);
 extern void build_map_segment_test_1(Seq_T stream);
 extern void build_unmap_segment_test_1(Seq_T stream);
 extern void build_segment_store_load_test_1(Seq_T stream);
@@ -32,18 +33,22 @@ static struct test_info {
         /* writes instructions into sequence */
         void (*build_test)(Seq_T stream);
 } tests[] = {
-        { "halt",         NULL, "", build_halt_test },
+        // Given tests
         { "halt-verbose", NULL, "", build_verbose_halt_test },
+
+        // Unit tests
+        { "halt",         NULL, "", build_halt_test },
+        { "output_and_loadval", NULL, "B", build_load_value_output_test},
+        { "input", "PNM", "PNM", build_input_test },
+        { "conditional_move", NULL, "PPM", build_move_test },
         { "addition", NULL, "6", build_addition_test },
         { "multiplication", NULL, "2", build_multiplication_test },
         { "division", NULL, "3", build_division_test },
-        { "NAND", NULL, "2", build_nand_test },
-        { "conditional_move", NULL, "PPM", build_move_test },
-        { "input", "PNM", "PNM", build_input_test },
-        { "map_segment_1", NULL, "", build_map_segment_test_1 },
-        { "unmap_segment_1", NULL, "", build_unmap_segment_test_1 },
-        { "load_store_segment_1", NULL, "OS", build_segment_store_load_test_1 }
-        // { "load_program_1", NULL, "", build_load_program_test_1 }
+        { "bitwise_NAND", NULL, "2", build_nand_test },
+        { "map_segment", NULL, "", build_map_segment_test_1 },
+        { "unmap_segment", NULL, "", build_unmap_segment_test_1 },
+        { "load_store_segment", NULL, "OS", build_segment_store_load_test_1 },
+        { "load_program", NULL, "", build_load_program_test_1 }
 };
 
 

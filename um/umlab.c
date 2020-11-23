@@ -47,8 +47,17 @@ void Um_write_sequence(FILE *output, Seq_T stream)
 
 /* Unit tests for the UM */
 
+// Unit Test: Halt
 void build_halt_test(Seq_T stream)
 {
+    append(stream, halt());
+}
+
+// Unit Test: Load Value / Output
+void build_load_value_output_test(Seq_T stream)
+{
+    append(stream, loadval(r1, 'B'));
+    append(stream, output(r1));
     append(stream, halt());
 }
 
