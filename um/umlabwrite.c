@@ -60,9 +60,9 @@ static struct test_info {
         { "map_0_segments", NULL, "F", map_0_segments },
         { "map_and_umap_0_segments", NULL, "F", map_and_umap_0_segments },
         { "halt_instruction_from_load_program", NULL, "F", halt_from_load_program},
+        { "initial_register_value_check", NULL, "00000000", check_initial_register_values},
         // { "segment_ids_reused", NULL, "0", segment_ids_reused}
-        // { "segment_words_initial_values", NULL, "", segment_words_initial_values}
-        // { "initial_register_value_check", NULL, "0", check_initial_register_values}
+        // { "segment_words_initial_values", NULL, "0000", segment_words_initial_values}
 };
 
 
