@@ -13,12 +13,12 @@ int main(int argc, char **argv)
 {
     // Open the file
     if (argc != 2) {
-        fprintf(stderr, "Usage: ./um [um instruction file]");
+        fprintf(stderr, "Usage: ./um [um instruction file]\n");
         exit(EXIT_FAILURE);
     }
     FILE *fp = fopen(argv[1], "r");
     if (fp == NULL) {
-        fprintf(stderr, "Specified um instruction file does not exist.");
+        fprintf(stderr, "Specified um instruction file does not exist.\n");
         exit(EXIT_FAILURE);
     }
 
