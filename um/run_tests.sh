@@ -1,4 +1,5 @@
 #! /bin/sh
+# set -x
 make all
 ./writetests
 cd tests
@@ -26,4 +27,4 @@ for testFile in $testFiles ; do
         diff "$testName.mine" "$testName.1"
     fi
 done
-echo "If no diff results showed, all tests succeeded."
+echo "If no diff results showed, all tests succeeded!"
