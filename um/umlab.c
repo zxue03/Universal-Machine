@@ -138,11 +138,6 @@ void build_input_test(Seq_T stream)
     append(stream, halt());
 }
 
-void build_no_halt_test(Seq_T stream)
-{
-    append(stream, loadval(r4, 22));
-}
-
 void build_map_segment_test_1(Seq_T stream)
 {
     append(stream, loadval(r1, 77));
@@ -165,25 +160,42 @@ void build_unmap_segment_test_1(Seq_T stream)
 
 void build_segment_store_load_test_1(Seq_T stream)
 {
+    // r1: 77, r3: 80
     append(stream, loadval(r1, 77));
     append(stream, loadval(r3, 80));
+
+    // r2: segment of 77 words, r4: segment of 80 words
     append(stream, map_segment(r2, r1));
     append(stream, map_segment(r4, r3));
 
+    // load values
     append(stream, loadval(r5, 83));
     append(stream, loadval(r6, 0));
     append(stream, loadval(r7, 79));
+
+    // store r2[0] = 83
     append(stream, segmented_store(r2, r6, r5));
+
+    // store r4[79] = 79
     append(stream, segmented_store(r4, r7, r7));
 
+    // r0: 79
     append(stream, segmented_load(r0, r4, r7));
+
+    // output 79
     append(stream, output(r0));
 
+    // r7: 83
     append(stream, segmented_load(r7, r2, r6));
+
+    // output 83
     append(stream, output(r7));
 
+    // unmap both segments
     append(stream, unmap_segment(r2));
     append(stream, unmap_segment(r4));
+
+    // halt
     append(stream, halt());
 }
 
