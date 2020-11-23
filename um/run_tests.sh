@@ -14,8 +14,11 @@ mv *.0 tests
 mv *.1 tests
 cd tests
 testFiles=$(ls *.um)
+echo ""
+echo "==========STARTING TESTS=========="
 for testFile in $testFiles ; do
     testName=$(echo $testFile | sed -E 's/(.*).um/\1/')
+    echo -n "Testing $testName..."
     if [ -e "$testName.0" ] ; then
         um "$testName.um" < "$testName.0" > "$testName.rf"
         ../um "$testName.um" < "$testName.0" > "$testName.mine"
@@ -28,5 +31,8 @@ for testFile in $testFiles ; do
         diff "$testName.rf" "$testName.1"
         diff "$testName.mine" "$testName.1"
     fi
+    echo " Done!"
 done
+echo "==========TESTING FINISHED=========="
+echo ""
 echo "If no diff results showed, all tests succeeded!"
