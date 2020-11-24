@@ -1,0 +1,66 @@
+# README
+## Authors
+Kevin Gao (kgao03) and Zhicheng Xue (zxue03)
+
+## Acknowledgements
+* We'd like to thank the TAs for helping us with handling the 64-bit memory
+pointers and shell scripting.
+* We'd like to thank the COMP-40 staff for providing the bitpack interface
+and the um-lab files, which greatly eased the unit testing process.
+
+##Implementation
+* We have implemented the um based on our design for the most part. The only
+part we have changed is we don't have a separate file to generating unit tests
+for um operations, simply because we realize the provided um-lab program is
+perfect for unit testing.
+
+##Architecture
+* um_util.h: This file standardizes inter-module communication by specifying
+the structure of shared structs, enums, and constants. In particular, it
+defines the um struct, which contains the registers and memory Sequences.
+
+* um_operations.h: Function declarations of um_operations, which handle the
+execution of each operation instruction.
+
+* um_operations.c: Implementation of the functions of um_operations, which
+handle the execution of each operation instruction.
+
+* um_engine.h: Public interface of um_engine, namely run_um, which handles
+starting a um machine, executing the instructions, and freeing relevant memory.
+
+* um_engine.c: implements the functions of um_engine, which handles starting
+a um machine, executing the instructions, and freeing all relevant memory
+
+* um.c: the driver of the emulator - opens up the .um file and uses um_engine
+interface to run the um.
+
+##Performance of 50 million instructions
+
+
+##Unit Tests
+The operation(s) each .um file tests is clearly shown in the file name.
+* addition.um: 
+* bitwise_NAND.um
+* conditional_move.um
+* division.um
+* halt_instruction_from_load_program.um
+* halt.um
+* halt-verbose.um
+* input.um
+* load_program.um
+* load_store_segment.um
+* map_0_segments.um
+* map_and_umap_0_segments.um
+* multiplication.um
+* output_and_loadval.um
+* unmap_segment.um
+
+##Hours Spent
+* Analyzing
+We spent around 3 hours understanding the problem and planning our solution
+
+* Preparing design
+We spent around 4 hours on designing.
+
+* Solving
+We spent around 12-15 hours implementing our solution
