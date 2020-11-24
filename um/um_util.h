@@ -48,6 +48,4 @@ typedef struct Segment {
     uint32_t *words;
 } *Segment;
 
-// TODO: delete_segment
-
 #endif
