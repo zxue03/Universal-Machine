@@ -41,9 +41,9 @@ Instruction Set Test Order:
 Stress Tests:
 - Map 0 Segments
 - Append Halt instruction by load program
-
 - Each word in a new segment maps to 0
 - Correct register values on startup
+- Directly edit instructions
+
 - Check segment ids are reused
 - Check that after loading a program, the previous segment still exists
-- Directly edit instructions
