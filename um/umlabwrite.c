@@ -29,6 +29,7 @@ extern void halt_from_load_program(Seq_T stream);
 extern void check_initial_register_values(Seq_T stream);
 extern void segment_words_initial_values(Seq_T stream);
 extern void segment_ids_reused(Seq_T stream);
+extern void edit_instruction_segment(Seq_T stream);
 
 /* The array `tests` contains all unit tests for the lab. */
 
@@ -61,6 +62,7 @@ static struct test_info {
         { "map_and_umap_0_segments", NULL, "F", map_and_umap_0_segments },
         { "halt_instruction_from_load_program", NULL, "F", halt_from_load_program},
         { "initial_register_value_check", NULL, "00000000", check_initial_register_values},
+        { "edit_instruction_segment", NULL, "1", edit_instruction_segment }
         // { "segment_ids_reused", NULL, "0", segment_ids_reused}
         // { "segment_words_initial_values", NULL, "0000", segment_words_initial_values}
 };

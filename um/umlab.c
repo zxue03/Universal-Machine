@@ -281,7 +281,6 @@ void halt_from_load_program(Seq_T stream)
 
     // Load the program that prints r0 and halts
     append(stream, load_program(r7, r6));
-    append(stream, halt());
 }
 
 // Stress Test: initial register values
@@ -345,4 +344,25 @@ void segment_ids_reused(Seq_T stream)
     append(stream, addition(r4, r4, 48));
     append(stream, output(r4));
     append(stream, halt());
+}
+
+// Stress Test: edit m[0] with a halt command before the end
+void edit_instruction_segment(Seq_T stream)
+{
+    append(stream, loadval(r1, 1));
+    append(stream, loadval(r2, 1024));
+    append(stream, multiplication(r1, r1, r2));
+    append(stream, multiplication(r1, r1, r2));
+    append(stream, multiplication(r1, r1, r2));
+    append(stream, loadval(r2, 2));
+    append(stream, multiplication(r1, r1, r2));
+    append(stream, bitwise_NAND(r1, r1, r1));
+    
+    append(stream, loadval(r2, 49));
+    append(stream, loadval(r3, 50));
+    append(stream, loadval(r4, 14));
+    append(stream, loadval(r6, 0));
+    append(stream, output(r2));
+    append(stream, segmented_store(r6, r4, r1));
+    append(stream, output(r3));
 }
