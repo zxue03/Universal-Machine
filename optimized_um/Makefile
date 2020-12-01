@@ -6,11 +6,11 @@
 
 ############## Variables ###############
 
-CC = gcc
+CC = gcc -O2
 IFLAGS = -I/comp/40/build/include -I/usr/sup/cii40/include/cii
 CFLAGS = -g -std=gnu99 -Wall -Wextra -Werror -Wfatal-errors -pedantic $(IFLAGS)
 LDFLAGS = -g -L/comp/40/build/lib -L/usr/sup/cii40/lib64
-LDLIBS = -lbitpack -lcii40 -lm -lrt -l40locality -larith40
+LDLIBS = -lbitpack -lcii40-O2 -lm -lrt -l40locality -larith40
 INCLUDES = $(shell echo *.h)
 
 ############### Rules ###############
@@ -26,9 +26,6 @@ all: clean um writetests
 ## Linking step (.o -> executable program)
 
 um: um.o um_engine.o um_operations.o
-	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
-
-writetests: umlabwrite.o umlab.o instructions.o
 	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 
 clean:

@@ -151,9 +151,9 @@ void execute_instructions (UM um) {
 
         // Retrieve the corresponding registers used
         Um_register registers[8] = {r0, r1, r2, r3, r4, r5, r6, r7};
-        Um_register ra;
-        Um_register rb;
-        Um_register rc;
+        Um_register ra = -1;
+        Um_register rb = -1;
+        Um_register rc = -1;
 
         // Regular three_register instructions
         if (opcode != LV) {
