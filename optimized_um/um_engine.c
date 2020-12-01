@@ -136,6 +136,10 @@ void read_instructions (UM um, FILE *fp) {
 */
 void execute_instructions (UM um) {
 
+
+    // Retrieve the corresponding registers used
+    Um_register registers[8] = {r0, r1, r2, r3, r4, r5, r6, r7};
+
     // Loop through each instruction
     while (true) {
 
@@ -149,67 +153,121 @@ void execute_instructions (UM um) {
         // Retrieve the opcode
         int opcode = Bitpack_getu(cur_instruction, 4, 28);
 
-        // Retrieve the corresponding registers used
-        Um_register registers[8] = {r0, r1, r2, r3, r4, r5, r6, r7};
-        Um_register ra = -1;
-        Um_register rb = -1;
-        Um_register rc = -1;
-
-        // Regular three_register instructions
-        if (opcode != LV) {
+        // Execute the corresponding instruction
+        if (opcode == CMOV) {
+            Um_register ra = -1;
+            Um_register rb = -1;
+            Um_register rc = -1;
             int ra_bits = Bitpack_getu(cur_instruction, 3, 6);
             int rb_bits = Bitpack_getu(cur_instruction, 3, 3);
             int rc_bits = Bitpack_getu(cur_instruction, 3, 0);
-
-            // Match the bits of the word to their respective registers
-            if (0 <= ra_bits && ra_bits <= 7) {
-                ra = registers[ra_bits];
-            }
-            if (0 <= rb_bits && rb_bits <= 7) {
-                rb = registers[rb_bits];
-            }
-            if (0 <= rc_bits && rc_bits <= 7) {
-                rc = registers[rc_bits];
-            }
-            // Different location for ra in the load value operation
-        } else {
-            int ra_bits = Bitpack_getu(cur_instruction, 3, 25);
-            if (0 <= ra_bits && ra_bits <= 7) {
-                ra = registers[ra_bits];
-            }
-        }
-
-        // Execute the corresponding instruction
-        if (opcode == CMOV) {
+            ra = registers[ra_bits];
+            rb = registers[rb_bits];
+            rc = registers[rc_bits];
             op_conditional_move(um, ra, rb, rc);
         } else if (opcode == SLOAD) {
+            Um_register ra = -1;
+            Um_register rb = -1;
+            Um_register rc = -1;
+            int ra_bits = Bitpack_getu(cur_instruction, 3, 6);
+            int rb_bits = Bitpack_getu(cur_instruction, 3, 3);
+            int rc_bits = Bitpack_getu(cur_instruction, 3, 0);
+            ra = registers[ra_bits];
+            rb = registers[rb_bits];
+            rc = registers[rc_bits];
             op_segmented_load(um, ra, rb, rc);
         } else if (opcode == SSTORE) {
+            Um_register ra = -1;
+            Um_register rb = -1;
+            Um_register rc = -1;
+            int ra_bits = Bitpack_getu(cur_instruction, 3, 6);
+            int rb_bits = Bitpack_getu(cur_instruction, 3, 3);
+            int rc_bits = Bitpack_getu(cur_instruction, 3, 0);
+            ra = registers[ra_bits];
+            rb = registers[rb_bits];
+            rc = registers[rc_bits];
             op_segmented_store(um, ra, rb, rc);
         } else if (opcode == ADD) {
+            Um_register ra = -1;
+            Um_register rb = -1;
+            Um_register rc = -1;
+            int ra_bits = Bitpack_getu(cur_instruction, 3, 6);
+            int rb_bits = Bitpack_getu(cur_instruction, 3, 3);
+            int rc_bits = Bitpack_getu(cur_instruction, 3, 0);
+            ra = registers[ra_bits];
+            rb = registers[rb_bits];
+            rc = registers[rc_bits];
             op_addition(um, ra, rb, rc);
         } else if (opcode == MUL) {
+            Um_register ra = -1;
+            Um_register rb = -1;
+            Um_register rc = -1;
+            int ra_bits = Bitpack_getu(cur_instruction, 3, 6);
+            int rb_bits = Bitpack_getu(cur_instruction, 3, 3);
+            int rc_bits = Bitpack_getu(cur_instruction, 3, 0);
+            ra = registers[ra_bits];
+            rb = registers[rb_bits];
+            rc = registers[rc_bits];
             op_multiplication(um, ra, rb, rc);
         } else if (opcode == DIV) {
+            Um_register ra = -1;
+            Um_register rb = -1;
+            Um_register rc = -1;
+            int ra_bits = Bitpack_getu(cur_instruction, 3, 6);
+            int rb_bits = Bitpack_getu(cur_instruction, 3, 3);
+            int rc_bits = Bitpack_getu(cur_instruction, 3, 0);
+            ra = registers[ra_bits];
+            rb = registers[rb_bits];
+            rc = registers[rc_bits];
             op_division(um, ra, rb, rc);
         } else if (opcode == NAND) {
+            Um_register ra = -1;
+            Um_register rb = -1;
+            Um_register rc = -1;
+            int ra_bits = Bitpack_getu(cur_instruction, 3, 6);
+            int rb_bits = Bitpack_getu(cur_instruction, 3, 3);
+            int rc_bits = Bitpack_getu(cur_instruction, 3, 0);
+            ra = registers[ra_bits];
+            rb = registers[rb_bits];
+            rc = registers[rc_bits];
             op_bitwise_NAND(um, ra, rb, rc);
         } else if (opcode == HALT) {
-            if (op_halt() == 0) {
-                break;
-            }
+            break;
         } else if (opcode == ACTIVATE) {
+            Um_register rb = -1;
+            Um_register rc = -1;
+            int rb_bits = Bitpack_getu(cur_instruction, 3, 3);
+            int rc_bits = Bitpack_getu(cur_instruction, 3, 0);
+            rb = registers[rb_bits];
+            rc = registers[rc_bits];
             op_map_segment(um, rb, rc);
         } else if (opcode == INACTIVATE) {
+            Um_register rc = -1;
+            int rc_bits = Bitpack_getu(cur_instruction, 3, 0);
+            rc = registers[rc_bits];
             op_unmap_segment(um, rc);
         } else if (opcode == OUT) {
+            Um_register rc = -1;
+            int rc_bits = Bitpack_getu(cur_instruction, 3, 0);
+            rc = registers[rc_bits];
             op_output(um, rc);
         } else if (opcode == IN) {
+            Um_register rc = -1;
+            int rc_bits = Bitpack_getu(cur_instruction, 3, 0);
+            rc = registers[rc_bits];
             op_input(um, rc);
         } else if (opcode == LOADP) {
+            Um_register rb = -1;
+            Um_register rc = -1;
+            int rb_bits = Bitpack_getu(cur_instruction, 3, 3);
+            int rc_bits = Bitpack_getu(cur_instruction, 3, 0);
+            rb = registers[rb_bits];
+            rc = registers[rc_bits];
             op_load_program(um, rb, rc);
             continue;
         } else if (opcode == LV) {
+            int ra_bits = Bitpack_getu(cur_instruction, 3, 25);
+            Um_register ra = registers[ra_bits];
             uint32_t value = Bitpack_getu(cur_instruction, 25, 0);
             op_load_value(um, ra, value);
         }
