@@ -236,9 +236,14 @@ void op_output(UM um, Um_register rc)
 void op_input(UM um, Um_register rc)
 {
     // Take input from stdin
-    unsigned char input;
-    scanf("%c", &input);
-    um->registers[rc] = input;
+    int input = getc(stdin);
+    if (input == -1) {
+        uint32_t value = 0;
+        value = ~value;
+        um->registers[rc] = value;
+    } else {
+        um->registers[rc] = input;
+    }
 }
 
 /*
