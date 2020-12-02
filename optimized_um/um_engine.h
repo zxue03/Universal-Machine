@@ -15,6 +15,9 @@
 #include <seq.h>
 #include <assert.h>
 #include <except.h>
+#include <seq.h>
+#include <inttypes.h>
+#include "um_util.h"
 
 void run_um (FILE *file);
 

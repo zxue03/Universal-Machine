@@ -15,7 +15,7 @@ INCLUDES = $(shell echo *.h)
 
 ############### Rules ###############
 
-all: clean um writetests
+all: clean um
 
 ## Compile step (.c files -> .o files)
 
@@ -25,7 +25,7 @@ all: clean um writetests
 
 ## Linking step (.o -> executable program)
 
-um: um.o um_engine.o um_operations.o
+um: um.o um_engine.o
 	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 
 clean:
