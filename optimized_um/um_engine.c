@@ -544,14 +544,9 @@ void execute_instructions (UM um) {
     uint32_t *instructions = instruction_segment->words;
     Um_instruction cur_instruction = 0;
     int opcode = -1;
+    bool doLoop = true;
     // Loop through each instruction
-    while (true) {
-
-        // Retrieve the segment and instructions
-        if(opcode == LOADP){
-            instruction_segment = (Segment) Seq_get(um->mapped, 0);
-            instructions = instruction_segment->words;
-        }
+    while (doLoop) {
 
         // Retrieve the current instruction
         cur_instruction = instructions[um->counter];
@@ -560,65 +555,81 @@ void execute_instructions (UM um) {
         opcode = Bitpack_getu(cur_instruction, 4, 28);
 
         // Execute the corresponding instruction
-        if (opcode == CMOV) {
-            ra = Bitpack_getu(cur_instruction, 3, 6);
-            rb = Bitpack_getu(cur_instruction, 3, 3);
-            rc = Bitpack_getu(cur_instruction, 3, 0);
-            op_conditional_move(um, ra, rb, rc);
-        } else if (opcode == SLOAD) {
-            ra = Bitpack_getu(cur_instruction, 3, 6);
-            rb = Bitpack_getu(cur_instruction, 3, 3);
-            rc = Bitpack_getu(cur_instruction, 3, 0);
-            op_segmented_load(um, ra, rb, rc);
-        } else if (opcode == SSTORE) {
-            ra = Bitpack_getu(cur_instruction, 3, 6);
-            rb = Bitpack_getu(cur_instruction, 3, 3);
-            rc = Bitpack_getu(cur_instruction, 3, 0);
-            op_segmented_store(um, ra, rb, rc);
-        } else if (opcode == ADD) {
-            ra = Bitpack_getu(cur_instruction, 3, 6);
-            rb = Bitpack_getu(cur_instruction, 3, 3);
-            rc = Bitpack_getu(cur_instruction, 3, 0);
-            op_addition(um, ra, rb, rc);
-        } else if (opcode == MUL) {
-            ra = Bitpack_getu(cur_instruction, 3, 6);
-            rb = Bitpack_getu(cur_instruction, 3, 3);
-            rc = Bitpack_getu(cur_instruction, 3, 0);
-            op_multiplication(um, ra, rb, rc);
-        } else if (opcode == DIV) {
-            ra = Bitpack_getu(cur_instruction, 3, 6);
-            rb = Bitpack_getu(cur_instruction, 3, 3);
-            rc = Bitpack_getu(cur_instruction, 3, 0);
-            op_division(um, ra, rb, rc);
-        } else if (opcode == NAND) {
-            ra = Bitpack_getu(cur_instruction, 3, 6);
-            rb = Bitpack_getu(cur_instruction, 3, 3);
-            rc = Bitpack_getu(cur_instruction, 3, 0);
-            op_bitwise_NAND(um, ra, rb, rc);
-        } else if (opcode == HALT) {
-            break;
-        } else if (opcode == ACTIVATE) {
-            rb = Bitpack_getu(cur_instruction, 3, 3);
-            rc = Bitpack_getu(cur_instruction, 3, 0);
-            op_map_segment(um, rb, rc);
-        } else if (opcode == INACTIVATE) {
-            rc = Bitpack_getu(cur_instruction, 3, 0);
-            op_unmap_segment(um, rc);
-        } else if (opcode == OUT) {
-            rc = Bitpack_getu(cur_instruction, 3, 0);
-            op_output(um, rc);
-        } else if (opcode == IN) {
-            rc = Bitpack_getu(cur_instruction, 3, 0);
-            op_input(um, rc);
-        } else if (opcode == LOADP) {
-            rb = Bitpack_getu(cur_instruction, 3, 3);
-            rc = Bitpack_getu(cur_instruction, 3, 0);
-            op_load_program(um, rb, rc);
-            continue;
-        } else if (opcode == LV) {
-            ra = Bitpack_getu(cur_instruction, 3, 25);
-            uint32_t value = Bitpack_getu(cur_instruction, 25, 0);
-            um->registers[ra] = value;
+        switch(opcode){
+          case CMOV:
+              ra = Bitpack_getu(cur_instruction, 3, 6);
+              rb = Bitpack_getu(cur_instruction, 3, 3);
+              rc = Bitpack_getu(cur_instruction, 3, 0);
+              op_conditional_move(um, ra, rb, rc);
+              break;
+          case SLOAD:
+              ra = Bitpack_getu(cur_instruction, 3, 6);
+              rb = Bitpack_getu(cur_instruction, 3, 3);
+              rc = Bitpack_getu(cur_instruction, 3, 0);
+              op_segmented_load(um, ra, rb, rc);
+              break;
+          case SSTORE:
+              ra = Bitpack_getu(cur_instruction, 3, 6);
+              rb = Bitpack_getu(cur_instruction, 3, 3);
+              rc = Bitpack_getu(cur_instruction, 3, 0);
+              op_segmented_store(um, ra, rb, rc);
+              break;
+          case ADD:
+              ra = Bitpack_getu(cur_instruction, 3, 6);
+              rb = Bitpack_getu(cur_instruction, 3, 3);
+              rc = Bitpack_getu(cur_instruction, 3, 0);
+              op_addition(um, ra, rb, rc);
+              break;
+          case MUL:
+              ra = Bitpack_getu(cur_instruction, 3, 6);
+              rb = Bitpack_getu(cur_instruction, 3, 3);
+              rc = Bitpack_getu(cur_instruction, 3, 0);
+              op_multiplication(um, ra, rb, rc);
+              break;
+          case DIV:
+              ra = Bitpack_getu(cur_instruction, 3, 6);
+              rb = Bitpack_getu(cur_instruction, 3, 3);
+              rc = Bitpack_getu(cur_instruction, 3, 0);
+              op_division(um, ra, rb, rc);
+              break;
+          case NAND:
+              ra = Bitpack_getu(cur_instruction, 3, 6);
+              rb = Bitpack_getu(cur_instruction, 3, 3);
+              rc = Bitpack_getu(cur_instruction, 3, 0);
+              op_bitwise_NAND(um, ra, rb, rc);
+              break;
+          case HALT:
+              doLoop = false;
+              break;
+          case ACTIVATE:
+              rb = Bitpack_getu(cur_instruction, 3, 3);
+              rc = Bitpack_getu(cur_instruction, 3, 0);
+              op_map_segment(um, rb, rc);
+              break;
+          case INACTIVATE:
+              rc = Bitpack_getu(cur_instruction, 3, 0);
+              op_unmap_segment(um, rc);
+              break;
+          case OUT:
+              rc = Bitpack_getu(cur_instruction, 3, 0);
+              op_output(um, rc);
+              break;
+          case IN:
+              rc = Bitpack_getu(cur_instruction, 3, 0);
+              op_input(um, rc);
+              break;
+          case LOADP:
+              rb = Bitpack_getu(cur_instruction, 3, 3);
+              rc = Bitpack_getu(cur_instruction, 3, 0);
+              op_load_program(um, rb, rc);
+              instruction_segment = (Segment) Seq_get(um->mapped, 0);
+              instructions = instruction_segment->words;
+              continue;
+          case LV:
+              ra = Bitpack_getu(cur_instruction, 3, 25);
+              uint32_t value = Bitpack_getu(cur_instruction, 25, 0);
+              um->registers[ra] = value;
+              break;
         }
         um->counter++;
     }
