@@ -14,7 +14,7 @@
 #include <stdbool.h>
 #include <seq.h>
 #include <assert.h>
-#include <bitpack.h>
+#include <except.h>
 
 void run_um (FILE *file);
 
