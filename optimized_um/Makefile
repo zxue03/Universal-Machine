@@ -29,4 +29,4 @@ um: um.o um_engine.o um_operations.o
 	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 
 clean:
-	rm -f um op writetests *.o *.um *.1 *.0
+	rm -f um op *.o *.um *.1 *.0
