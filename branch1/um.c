@@ -36,11 +36,8 @@ static inline void Seg_Dynamic_Array_ensure_size() {
     if (segments.num_elements < segments.num_actual) {
         return;
     }
-
-    Segment *new_seg_array = malloc(segments.num_actual * 2 * SEGMENT_SIZE);
-
     segments.num_actual *= 2;
-
+    Segment *new_seg_array = malloc(segments.num_actual * SEGMENT_SIZE);
     for (uint32_t i = 0; i < segments.num_elements; i++) {
         new_seg_array[i] = segments.seg_array[i];
     }
@@ -68,8 +65,8 @@ static inline void unmapped_Dynamic_Array_ensure_size() {
     if (unmapped.num_elements < unmapped.num_actual) {
         return;
     }
-    uint32_t *new_array = malloc(unmapped.num_actual * 2 * UINT32_T_SIZE);
     unmapped.num_actual *= 2;
+    uint32_t *new_array = malloc(unmapped.num_actual * UINT32_T_SIZE);
     for (uint32_t i = 0; i < unmapped.num_elements; i++) {
         new_array[i] = unmapped.array[i];
     }
@@ -273,16 +270,19 @@ uint64_t Bitpack_newu(uint64_t word, unsigned width, unsigned lsb,
 void read_instructions (FILE *fp) {
 
 
+    int c;
+    Um_instruction word;
+    int byte;
     while (true) {
-        int c = fgetc(fp);
+        c = fgetc(fp);
         if (c == -1) {
             break;
         } else {
             ungetc(c, fp);
         }
-        Um_instruction word = 0;
+        word = 0;
         for (int i = 24; i >= 0 ; i -= 8) {
-            int byte = fgetc(fp);
+            byte = fgetc(fp);
             word = Bitpack_newu(word, 8, i, byte);
         }
         unmapped_Dynamic_Array_ensure_size();
