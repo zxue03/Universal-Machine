@@ -86,23 +86,12 @@ static inline void op_conditional_move(Um_register ra, Um_register rb,
 
 static inline void op_segmented_load(Um_register ra, Um_register rb, Um_register rc)
 {
-    Segment temp1 = (segments.seg_array[um.registers[rb]]);
-    uint32_t *temp2 = temp1.words;
-    uint32_t temp3 = temp2[um.registers[rc]];
-    (void) temp3;
     um.registers[ra] = ((segments.seg_array[um.registers[rb]]).words)[um.registers[rc]];
 }
 
 static inline void op_segmented_store(Um_register ra, Um_register rb, Um_register rc)
 {
-    Segment temp1 = (segments.seg_array[um.registers[ra]]);
-    uint32_t *temp2 = temp1.words;
-    // fprintf(stderr, "%p | %p\n", (void *)(&temp1), (void *)temp2);
-    uint32_t temp3 = temp2[um.registers[rb]];
-    (void) temp3;
     ((segments.seg_array[um.registers[ra]]).words)[um.registers[rb]] = um.registers[rc];
-    // fprintf(stderr, "Stored: %u\n", ((segments.seg_array[um.registers[ra]]).words)[um.registers[rb]]);
-    // fprintf(stderr, "Should be: %u\n", um.registers[rc]);
 
 }
 
@@ -131,8 +120,7 @@ static inline void op_map_segment(Um_register rb, Um_register rc)
     // Allocate the memory for the segment
     uint32_t *real_memory = malloc(sizeof(uint32_t) * um.registers[rc]);
     assert(real_memory != NULL);
-    // fprintf(stderr, "====VALID MEMORY ADDRESS: %p\n", (void*)real_memory);
-
+  
     // Initialize each word to 0
     for (uint32_t i = 0; i < um.registers[rc]; i++) {
         real_memory[i] = 0;
@@ -142,12 +130,10 @@ static inline void op_map_segment(Um_register rb, Um_register rc)
 
     if (Seq_length(um.unmapped) > 0){
         id = (uint32_t)(uintptr_t)Seq_remlo(um.unmapped);
-        // fprintf(stderr, "old map :%d\n", id);
     } else {
 
         Seg_Dynamic_Array_ensure_size();
         id = segments.num_elements;
-          // fprintf(stderr, "new map :%d\n", id);
         segments.num_elements++;
     }
 
@@ -164,7 +150,6 @@ static inline void op_unmap_segment(Um_register rc)
 {
     // Free the segment memory
     free((segments.seg_array[um.registers[rc]]).words);
-    // fprintf(stderr, "====INVALID MEMORY ADDRESS: %p\n", (void*)((segments.seg_array[um.registers[rc]]).words));
     (segments.seg_array[um.registers[rc]]).length = 0;
     (segments.seg_array[um.registers[rc]]).words = NULL;
 
