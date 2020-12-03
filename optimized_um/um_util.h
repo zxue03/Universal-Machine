@@ -38,7 +38,7 @@ typedef struct UM {
     uint32_t counter;
     Seq_T mapped;
     Seq_T unmapped;
-} *UM;
+} UM;
 
 /*
 * Segment struct that represents a mapped segment
