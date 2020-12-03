@@ -383,6 +383,7 @@ void free_um () {
         }
     }
     Seq_free(&(um.unmapped));
+    free(segments.seg_array);
 }
 
 void run_um (FILE *file) {
