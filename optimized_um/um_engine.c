@@ -180,7 +180,7 @@ static inline bool Bitpack_fitsu(uint64_t n, unsigned width)
         return shr(n, width) == 0;
 }
 
-uint64_t Bitpack_getu(uint64_t word, unsigned width, unsigned lsb)
+static inline uint64_t Bitpack_getu(uint64_t word, unsigned width, unsigned lsb)
 {
         assert(width <= 64);
         unsigned hi = lsb + width; /* one beyond the most significant bit */
