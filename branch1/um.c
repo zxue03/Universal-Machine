@@ -144,7 +144,7 @@ static inline void op_input(Um_register rc)
     }
 }
 
-static inline void op_load_program(Um_register rb, Um_register rc)
+static inline void op_load_program(Um_register rb, Um_register rc, Segment instructions_segment)
 {
     // Set the instructions counter
     um.counter = um.registers[rc];
@@ -155,7 +155,6 @@ static inline void op_load_program(Um_register rb, Um_register rc)
     }
 
     // Retrieve the instructions segment
-    Segment instructions_segment = (Segment) Seq_get(um.mapped, 0);
     free(instructions_segment->words);
 
     // Retrieve the segment to duplicate
@@ -379,8 +378,7 @@ void execute_instructions () {
           case LOADP:
               rb = Bitpack_getu(cur_instruction, 3, 3);
               rc = Bitpack_getu(cur_instruction, 3, 0);
-              op_load_program(rb, rc);
-              instruction_segment = (Segment) Seq_get(um.mapped, 0);
+              op_load_program(rb, rc, instruction_segment);
               instructions = instruction_segment->words;
               continue;
           case LV:
