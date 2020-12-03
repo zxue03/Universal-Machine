@@ -4,7 +4,6 @@
 #include <seq.h>
 #include <assert.h>
 #include <except.h>
-#include <seq.h>
 #include <inttypes.h>
 
 #define UM_WORD_WIDTH 32
