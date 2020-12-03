@@ -39,6 +39,7 @@ static inline void Seg_Dynamic_Array_ensure_size() {
         return;
     }
 
+    fprintf(stderr, "expanding");
     Segment *new_seg_array = malloc(segments.num_actual * 2 * SEGMENT_SIZE);
 
     segments.num_actual *= 2;
@@ -88,10 +89,8 @@ static inline void op_segmented_load(Um_register ra, Um_register rb, Um_register
     Segment temp1 = (segments.seg_array[um.registers[rb]]);
     uint32_t *temp2 = temp1.words;
     uint32_t temp3 = temp2[um.registers[rc]];
-    // fprintf(stderr, "%p | %p | %u\n", (void *)(&temp1), (void *)temp2, temp3);
     (void) temp3;
     um.registers[ra] = ((segments.seg_array[um.registers[rb]]).words)[um.registers[rc]];
-    // fprintf(stderr, "Successfully read something.\n");
 }
 
 static inline void op_segmented_store(Um_register ra, Um_register rb, Um_register rc)
@@ -131,6 +130,7 @@ static inline void op_map_segment(Um_register rb, Um_register rc)
 {
     // Allocate the memory for the segment
     uint32_t *real_memory = malloc(sizeof(uint32_t) * um.registers[rc]);
+    assert(real_memory != NULL);
     // fprintf(stderr, "====VALID MEMORY ADDRESS: %p\n", (void*)real_memory);
 
     // Initialize each word to 0
@@ -142,14 +142,18 @@ static inline void op_map_segment(Um_register rb, Um_register rc)
 
     if (Seq_length(um.unmapped) > 0){
         id = (uint32_t)(uintptr_t)Seq_remlo(um.unmapped);
+        // fprintf(stderr, "old map :%d\n", id);
     } else {
+
         Seg_Dynamic_Array_ensure_size();
         id = segments.num_elements;
+          // fprintf(stderr, "new map :%d\n", id);
         segments.num_elements++;
     }
 
     (segments.seg_array[id]).words = real_memory;
     (segments.seg_array[id]).length = um.registers[rc];
+
 
     um.registers[rb] = id;
 
@@ -197,13 +201,16 @@ static inline void op_load_program(Um_register rb, Um_register rc)
         return;
     }
 
+
     free((segments.seg_array[0]).words);
 
     Segment load_from = (segments.seg_array[um.registers[rb]]);
 
     uint32_t *new_words = malloc(load_from.length * UINT32_T_SIZE);
+    assert(new_words != NULL);
 
     // Copy words in the segment
+
     for (uint32_t i = 0; i < load_from.length; i++)  {
         new_words[i] = (load_from.words)[i];
     }
@@ -294,14 +301,16 @@ void read_instructions (FILE *fp) {
     (segments.seg_array[0]).length = Seq_length(instructions);
 
     // Create words array with length of sequence
-    uint32_t *words = malloc(UINT32_T_SIZE * (segments.seg_array[0]).length);
-
+    uint32_t *words = malloc(sizeof(uint32_t) * Seq_length(instructions));
+    assert(words != NULL);
     // Copy the values in the sequence to the words array
     for (uint32_t i = 0; i < (segments.seg_array[0]).length; i++) {
         words[i] = (uint32_t)(uintptr_t)Seq_get(instructions, i);
     }
 
     (segments.seg_array[0]).words = words;
+
+    segments.num_elements++;
 
     Seq_free(&instructions);
 }
@@ -326,7 +335,6 @@ void execute_instructions () {
         // Retrieve the opcode
         opcode = Bitpack_getu(cur_instruction, 4, 28);
 
-        // fprintf(stderr, "\nOPERATION: %d\n", opcode);
 
         // Execute the corresponding instruction
         switch(opcode){
@@ -396,7 +404,9 @@ void execute_instructions () {
               rb = Bitpack_getu(cur_instruction, 3, 3);
               rc = Bitpack_getu(cur_instruction, 3, 0);
               op_load_program(rb, rc);
-              instructions = (segments.seg_array[0]).words;
+              if(um.registers[rb] != 0){
+                instructions = (segments.seg_array[0]).words;
+              }
               continue;
           case LV:
               ra = Bitpack_getu(cur_instruction, 3, 25);
@@ -420,7 +430,6 @@ void free_um () {
 
 void run_um (FILE *file) {
 
-    fprintf(stderr, "RUNNING THE NEW UM.c\n");
 
     Seg_Dynamic_Array_init();
 
@@ -449,12 +458,10 @@ int main(int argc, char **argv)
 {
     // Open the file
     if (argc != 2) {
-        // fprintf(stderr, "Usage: ./um [um instruction file]\n");
         exit(EXIT_FAILURE);
     }
     FILE *fp = fopen(argv[1], "r");
     if (fp == NULL) {
-        // fprintf(stderr, "Specified um instruction file does not exist.\n");
         exit(EXIT_FAILURE);
     }
 
