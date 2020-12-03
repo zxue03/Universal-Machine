@@ -12,6 +12,50 @@
 #define NUM_REGISTERS 8
 #define SEGMENT_HINT 65536
 
+typedef struct Segment {
+    uint32_t length;
+    uint32_t *words;
+} Segment;
+
+const uint32_t SEGMENT_SIZE = sizeof(Segment);
+const uint32_t UINT32_T_SIZE = sizeof(uint32_t);
+
+typedef struct Seg_Dynamic_Array {
+    uint32_t num_elements;
+    uint32_t num_actual;
+    Segment *seg_array;
+} Seg_Dynamic_Array;
+
+Seg_Dynamic_Array segments;
+
+static inline void Seg_Dynamic_Array_init() {
+    segments.num_elements = 0;
+    segments.num_actual = SEGMENT_HINT;
+    segments.seg_array = malloc(SEGMENT_HINT * SEGMENT_SIZE);
+}
+
+static inline void Seg_Dynamic_Array_ensure_size() {
+    if (segments.num_elements < segments.num_actual) {
+        return;
+    }
+
+    Segment *new_seg_array = malloc(segments.num_actual * 2 * SEGMENT_SIZE);
+
+    segments.num_actual *= 2;
+
+    for (uint32_t i = 0; i < segments.num_elements; i++) {
+        new_seg_array[i] = segments.seg_array[i];
+    }
+
+    free(segments.seg_array);
+
+    segments.seg_array = new_seg_array;
+}
+
+static inline void Seg_Dynamic_Array_remove() {
+    segments.num_elements--;
+}
+
 typedef uint32_t Um_instruction;
 
 typedef enum Um_opcode {
@@ -26,16 +70,10 @@ typedef enum Um_register {
 typedef struct UM {
     uint32_t registers [NUM_REGISTERS];
     uint32_t counter;
-    Seq_T mapped;
     Seq_T unmapped;
 } UM;
 
 UM um;
-
-typedef struct Segment {
-    uint32_t length;
-    uint32_t *words;
-} *Segment;
 
 static inline void op_conditional_move(Um_register ra, Um_register rb,
                                                             Um_register rc)
@@ -47,20 +85,26 @@ static inline void op_conditional_move(Um_register ra, Um_register rb,
 
 static inline void op_segmented_load(Um_register ra, Um_register rb, Um_register rc)
 {
-    Segment segment = (Segment) Seq_get(um.mapped, um.registers[rb]);
-    uint32_t *words = segment->words;
-
-    um.registers[ra] = words[um.registers[rc]];
+    Segment temp1 = (segments.seg_array[um.registers[rb]]);
+    uint32_t *temp2 = temp1.words;
+    uint32_t temp3 = temp2[um.registers[rc]];
+    // fprintf(stderr, "%p | %p | %u\n", (void *)(&temp1), (void *)temp2, temp3);
+    (void) temp3;
+    um.registers[ra] = ((segments.seg_array[um.registers[rb]]).words)[um.registers[rc]];
+    // fprintf(stderr, "Successfully read something.\n");
 }
 
 static inline void op_segmented_store(Um_register ra, Um_register rb, Um_register rc)
 {
-    // Retrieve the segment
-    Segment segment = (Segment) Seq_get(um.mapped, um.registers[ra]);
-    uint32_t *words = segment->words;
+    Segment temp1 = (segments.seg_array[um.registers[ra]]);
+    uint32_t *temp2 = temp1.words;
+    // fprintf(stderr, "%p | %p\n", (void *)(&temp1), (void *)temp2);
+    uint32_t temp3 = temp2[um.registers[rb]];
+    (void) temp3;
+    ((segments.seg_array[um.registers[ra]]).words)[um.registers[rb]] = um.registers[rc];
+    // fprintf(stderr, "Stored: %u\n", ((segments.seg_array[um.registers[ra]]).words)[um.registers[rb]]);
+    // fprintf(stderr, "Should be: %u\n", um.registers[rc]);
 
-    // Store the specific value
-    words[um.registers[rb]] = um.registers[rc];
 }
 
 static inline void op_addition(Um_register ra, Um_register rb, Um_register rc)
@@ -87,39 +131,38 @@ static inline void op_map_segment(Um_register rb, Um_register rc)
 {
     // Allocate the memory for the segment
     uint32_t *real_memory = malloc(sizeof(uint32_t) * um.registers[rc]);
-    assert(real_memory != NULL);
+    // fprintf(stderr, "====VALID MEMORY ADDRESS: %p\n", (void*)real_memory);
 
     // Initialize each word to 0
     for (uint32_t i = 0; i < um.registers[rc]; i++) {
         real_memory[i] = 0;
     }
 
-    Segment updated_segment;
-
-    // Assign to the lowest free index in mapped
     uint32_t id;
+
     if (Seq_length(um.unmapped) > 0){
         id = (uint32_t)(uintptr_t)Seq_remlo(um.unmapped);
-        updated_segment = (Segment) Seq_get(um.mapped, id);
     } else {
-        updated_segment = malloc(sizeof(*updated_segment));
-        assert(updated_segment != NULL);
-        id = Seq_length(um.mapped);
-        Seq_addhi(um.mapped, (void *) updated_segment);
+        Seg_Dynamic_Array_ensure_size();
+        id = segments.num_elements;
+        segments.num_elements++;
     }
-    updated_segment->length = um.registers[rc];
-    updated_segment->words = real_memory;
+
+    (segments.seg_array[id]).words = real_memory;
+    (segments.seg_array[id]).length = um.registers[rc];
 
     um.registers[rb] = id;
+
+    // fprintf(stderr, "INITIAL VALUE: %u\n", segments.seg_array[id].words[0]);
 }
 
 static inline void op_unmap_segment(Um_register rc)
 {
     // Free the segment memory
-    Segment segment = (Segment) Seq_get(um.mapped, um.registers[rc]);
-    free(segment->words);
-    segment->length = 0;
-    segment->words = NULL;
+    free((segments.seg_array[um.registers[rc]]).words);
+    // fprintf(stderr, "====INVALID MEMORY ADDRESS: %p\n", (void*)((segments.seg_array[um.registers[rc]]).words));
+    (segments.seg_array[um.registers[rc]]).length = 0;
+    (segments.seg_array[um.registers[rc]]).words = NULL;
 
     // Add the id to unmapped
     Seq_addhi(um.unmapped, (void *)(uintptr_t)um.registers[rc]);
@@ -144,7 +187,7 @@ static inline void op_input(Um_register rc)
     }
 }
 
-static inline void op_load_program(Um_register rb, Um_register rc, Segment instructions_segment)
+static inline void op_load_program(Um_register rb, Um_register rc)
 {
     // Set the instructions counter
     um.counter = um.registers[rc];
@@ -154,25 +197,20 @@ static inline void op_load_program(Um_register rb, Um_register rc, Segment instr
         return;
     }
 
-    // Retrieve the instructions segment
-    free(instructions_segment->words);
+    free((segments.seg_array[0]).words);
 
-    // Retrieve the segment to duplicate
-    Segment load_from = (Segment) Seq_get(um.mapped, um.registers[rb]);
+    Segment load_from = (segments.seg_array[um.registers[rb]]);
 
-    // Create new words segment
-    uint32_t *new_words = malloc(load_from->length * sizeof(uint32_t));
-    assert(new_words != NULL);
-
+    uint32_t *new_words = malloc(load_from.length * UINT32_T_SIZE);
 
     // Copy words in the segment
-    for (uint32_t i = 0; i < load_from->length; i++)  {
-        new_words[i] = (load_from->words)[i];
+    for (uint32_t i = 0; i < load_from.length; i++)  {
+        new_words[i] = (load_from.words)[i];
     }
 
     // Update instructions segments fields
-    instructions_segment->length = load_from->length;
-    instructions_segment->words = new_words;
+    (segments.seg_array[0]).length = load_from.length;
+    (segments.seg_array[0]).words = new_words;
 }
 
 static inline void op_load_value(Um_register ra, uint32_t value)
@@ -229,24 +267,6 @@ uint64_t Bitpack_newu(uint64_t word, unsigned width, unsigned lsb,
                 | (value << lsb);                     /* new part  */
 }
 
-void initialize_um () {
-
-    // Instruction counter
-    um.counter = 0;
-
-    // Array for registers
-    for(int i = 0; i < NUM_REGISTERS; i++){
-        um.registers[i] = 0;
-    }
-
-    // Sequences for segments
-    um.mapped = Seq_new(SEGMENT_HINT);
-    assert(um.mapped != NULL);
-    um.unmapped = Seq_new(SEGMENT_HINT);
-    assert(um.unmapped != NULL);
-
-}
-
 void read_instructions (FILE *fp) {
 
     // Create sequence to hold the instructions
@@ -271,22 +291,17 @@ void read_instructions (FILE *fp) {
     }
 
     // Create segment representing the program
-    Segment segment0 = malloc(sizeof(*segment0));
-    assert(segment0 != NULL);
-    segment0->length = Seq_length(instructions);
+    (segments.seg_array[0]).length = Seq_length(instructions);
 
     // Create words array with length of sequence
-    uint32_t *words = malloc(sizeof(uint32_t) * segment0->length);
-    assert(words != NULL);
-    segment0->words = words;
+    uint32_t *words = malloc(UINT32_T_SIZE * (segments.seg_array[0]).length);
 
     // Copy the values in the sequence to the words array
-    for (uint32_t i = 0; i < segment0->length; i++) {
+    for (uint32_t i = 0; i < (segments.seg_array[0]).length; i++) {
         words[i] = (uint32_t)(uintptr_t)Seq_get(instructions, i);
     }
 
-    // Store segment as m[0]
-    Seq_addhi(um.mapped, (void *) segment0);
+    (segments.seg_array[0]).words = words;
 
     Seq_free(&instructions);
 }
@@ -297,11 +312,11 @@ void execute_instructions () {
     Um_register rb = -1;
     Um_register rc = -1;
 
-    Segment instruction_segment = (Segment) Seq_get(um.mapped, 0);
-    uint32_t *instructions = instruction_segment->words;
+    uint32_t *instructions = (segments.seg_array[0]).words;
     Um_instruction cur_instruction = 0;
     int opcode = -1;
     bool doLoop = true;
+
     // Loop through each instruction
     while (doLoop) {
 
@@ -310,6 +325,8 @@ void execute_instructions () {
 
         // Retrieve the opcode
         opcode = Bitpack_getu(cur_instruction, 4, 28);
+
+        // fprintf(stderr, "\nOPERATION: %d\n", opcode);
 
         // Execute the corresponding instruction
         switch(opcode){
@@ -378,8 +395,8 @@ void execute_instructions () {
           case LOADP:
               rb = Bitpack_getu(cur_instruction, 3, 3);
               rc = Bitpack_getu(cur_instruction, 3, 0);
-              op_load_program(rb, rc, instruction_segment);
-              instructions = instruction_segment->words;
+              op_load_program(rb, rc);
+              instructions = (segments.seg_array[0]).words;
               continue;
           case LV:
               ra = Bitpack_getu(cur_instruction, 3, 25);
@@ -392,30 +409,32 @@ void execute_instructions () {
 }
 
 void free_um () {
-
-    // Delete segments
-    size_t num_segments = Seq_length(um.mapped);
+    size_t num_segments = (segments.num_elements);
     for (size_t i = 0; i < num_segments; i++) {
-
-        // Free the all of the words in each segment
-        Segment segment = Seq_get(um.mapped, i);
-        int num_words = segment->length;
-        if (num_words >= 1) {
-            free(segment->words);
+        if ( (segments.seg_array[i]).length >= 1){
+            free((segments.seg_array[i]).words);
         }
-
-        // Free the segment struct itself
-        free(segment);
     }
-
-    // Free struct fields
-    Seq_free(&(um.mapped));
     Seq_free(&(um.unmapped));
 }
 
 void run_um (FILE *file) {
 
-    initialize_um();
+    fprintf(stderr, "RUNNING THE NEW UM.c\n");
+
+    Seg_Dynamic_Array_init();
+
+    // Instruction counter
+    um.counter = 0;
+
+    // Array for registers
+    for(int i = 0; i < NUM_REGISTERS; i++){
+        um.registers[i] = 0;
+    }
+
+    um.unmapped = Seq_new(SEGMENT_HINT);
+    assert(um.unmapped != NULL);
+
     // Read in the initial instructions
     read_instructions(file);
 
@@ -430,12 +449,12 @@ int main(int argc, char **argv)
 {
     // Open the file
     if (argc != 2) {
-        fprintf(stderr, "Usage: ./um [um instruction file]\n");
+        // fprintf(stderr, "Usage: ./um [um instruction file]\n");
         exit(EXIT_FAILURE);
     }
     FILE *fp = fopen(argv[1], "r");
     if (fp == NULL) {
-        fprintf(stderr, "Specified um instruction file does not exist.\n");
+        // fprintf(stderr, "Specified um instruction file does not exist.\n");
         exit(EXIT_FAILURE);
     }
 
