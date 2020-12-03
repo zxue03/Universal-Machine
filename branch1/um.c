@@ -118,7 +118,7 @@ static inline void op_bitwise_NAND(Um_register ra, Um_register rb, Um_register r
 static inline void op_map_segment(Um_register rb, Um_register rc)
 {
     // Allocate the memory for the segment
-    uint32_t *real_memory = malloc(sizeof(uint32_t) * um.registers[rc]);
+    uint32_t *real_memory = malloc(UINT32_T_SIZE * um.registers[rc]);
     assert(real_memory != NULL);
   
     // Initialize each word to 0
@@ -286,7 +286,7 @@ void read_instructions (FILE *fp) {
     (segments.seg_array[0]).length = Seq_length(instructions);
 
     // Create words array with length of sequence
-    uint32_t *words = malloc(sizeof(uint32_t) * Seq_length(instructions));
+    uint32_t *words = malloc(UINT32_T_SIZE * Seq_length(instructions));
     assert(words != NULL);
     // Copy the values in the sequence to the words array
     for (uint32_t i = 0; i < (segments.seg_array[0]).length; i++) {
