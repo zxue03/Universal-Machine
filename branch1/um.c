@@ -1,11 +1,3 @@
-/*
-*   um.c
-*   Authors: Louis Xue (zxue03) and Kevin Gao (kgao03)
-*
-*   This file holds the driver function for the program, opening the um
-*   instruction file and starting an emulator
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -18,27 +10,19 @@
 #define UM_WORD_WIDTH 32
 #define MAX_VAL 4294967296
 #define NUM_REGISTERS 8
+#define SEGMENT_HINT 65536
 
 typedef uint32_t Um_instruction;
 
-/*
-* Um_opcode enum that standardizes the instruction operation codes
-*/
 typedef enum Um_opcode {
         CMOV = 0, SLOAD, SSTORE, ADD, MUL, DIV,
         NAND, HALT, ACTIVATE, INACTIVATE, OUT, IN, LOADP, LV
 } Um_opcode;
 
-/*
-* Um_register enum that standardizes the register names
-*/
 typedef enum Um_register {
     r0 = 0, r1, r2, r3, r4, r5, r6, r7
 } Um_register;
 
-/*
-* UM struct that represents the registers and segments of the simulated UM
-*/
 typedef struct UM {
     uint32_t registers [NUM_REGISTERS];
     uint32_t counter;
@@ -46,27 +30,11 @@ typedef struct UM {
     Seq_T unmapped;
 } *UM;
 
-/*
-* Segment struct that represents a mapped segment
-*/
 typedef struct Segment {
     uint32_t length;
     uint32_t *words;
 } *Segment;
 
-void run_um (FILE *file);
-
-/*
-* op_conditional_move
-* Performs the conditional move operation
-* Assigns ra to rb if rc is not 0
-* Arguments:
-*   - um - the UM struct with all register and segment information
-*   - ra - the Um_register to interpret as ra
-*   - rb - the Um_register to interpret as rb
-*   - rc - the Um_register to interpret as rc
-* Return: void
-*/
 static inline void op_conditional_move(UM um, Um_register ra, Um_register rb,
                                                             Um_register rc)
 {
@@ -75,38 +43,14 @@ static inline void op_conditional_move(UM um, Um_register ra, Um_register rb,
     }
 }
 
-/*
-* op_segmented_load
-* Performs the segmented_load operation
-* Loads the value at m[rb][rc] to ra
-* Arguments:
-*   - um - the UM struct with all register and segment information
-*   - ra - the Um_register to interpret as ra
-*   - rb - the Um_register to interpret as rb
-*   - rc - the Um_register to interpret as rc
-* Return: void
-*/
 static inline void op_segmented_load(UM um, Um_register ra, Um_register rb, Um_register rc)
 {
-    // Retrieve the segment
     Segment segment = (Segment) Seq_get(um->mapped, um->registers[rb]);
     uint32_t *words = segment->words;
 
-    // Load the specified value into ra
     um->registers[ra] = words[um->registers[rc]];
 }
 
-/*
-* op_segmented_store
-* Performs the segmented store operation
-* Assigns m[ra][rb] to rc
-* Arguments:
-*   - um - the UM struct with all register and segment information
-*   - ra - the Um_register to interpret as ra
-*   - rb - the Um_register to interpret as rb
-*   - rc - the Um_register to interpret as rc
-* Return: void
-*/
 static inline void op_segmented_store(UM um, Um_register ra, Um_register rb, Um_register rc)
 {
     // Retrieve the segment
@@ -117,81 +61,26 @@ static inline void op_segmented_store(UM um, Um_register ra, Um_register rb, Um_
     words[um->registers[rb]] = um->registers[rc];
 }
 
-/*
-* op_addtion
-* Performs the addtion operation
-* Assigns ra to the sum of rb and rc
-* Arguments:
-*   - um - the UM struct with all register and segment information
-*   - ra - the Um_register to interpret as ra
-*   - rb - the Um_register to interpret as rb
-*   - rc - the Um_register to interpret as rc
-* Return: void
-*/
 static inline void op_addition(UM um, Um_register ra, Um_register rb, Um_register rc)
 {
     um->registers[ra] = (um->registers[rb] + um->registers[rc]) % MAX_VAL;
 }
 
-/*
-* op_multiplication
-* Performs the multiplication operation
-* Assigns ra to the product of rb and rc
-* Arguments:
-*   - um - the UM struct with all register and segment information
-*   - ra - the Um_register to interpret as ra
-*   - rb - the Um_register to interpret as rb
-*   - rc - the Um_register to interpret as rc
-* Return: void
-*/
 static inline void op_multiplication(UM um, Um_register ra, Um_register rb, Um_register rc)
 {
       um->registers[ra] = (um->registers[rb] * um->registers[rc]) % MAX_VAL;
 }
 
-/*
-* op_division
-* Performs the division operation
-* Assigns ra to the quotient of rb and rc
-* Arguments:
-*   - um - the UM struct with all register and segment information
-*   - ra - the Um_register to interpret as ra
-*   - rb - the Um_register to interpret as rb
-*   - rc - the Um_register to interpret as rc
-* Return: void
-*/
 static inline void op_division(UM um, Um_register ra, Um_register rb, Um_register rc)
 {
       um->registers[ra] = um->registers[rb] / um->registers[rc];
 }
 
-/*
-* op_bitwise_NAND
-* Performs the NAND operation
-* Assigns ra to the bitwise NAND of rb and rc
-* Arguments:
-*   - um - the UM struct with all register and segment information
-*   - ra - the Um_register to interpret as ra
-*   - rb - the Um_register to interpret as rb
-*   - rc - the Um_register to interpret as rc
-* Return: void
-*/
 static inline void op_bitwise_NAND(UM um, Um_register ra, Um_register rb, Um_register rc)
 {
       um->registers[ra] = ~(um->registers[rb] & um->registers[rc]);
 }
 
-/*
-* op_map_segment
-* Performs the map_segment operation
-* Creates a new segment with the number of words equal to the value in rc
-* puts the identifier in rb
-* Arguments:
-*   - um - the UM struct with all register and segment information
-*   - rb - the Um_register to interpret as rb
-*   - rc - the Um_register to interpret as rc
-* Return: void
-*/
 static inline void op_map_segment(UM um, Um_register rb, Um_register rc)
 {
     // Allocate the memory for the segment
@@ -222,16 +111,6 @@ static inline void op_map_segment(UM um, Um_register rb, Um_register rc)
     um->registers[rb] = id;
 }
 
-/*
-* op_unmap_segment
-* Performs the unmap_segment operation
-* Unmaps the segment m[rc] and the identifier in rc can be reused in the future
-* Arguments:
-*   - um - the UM struct with all register and segment information
-*   - rb - the Um_register to interpret as rb
-*   - rc - the Um_register to interpret as rc
-* Return: void
-*/
 static inline void op_unmap_segment(UM um, Um_register rc)
 {
     // Free the segment memory
@@ -244,30 +123,12 @@ static inline void op_unmap_segment(UM um, Um_register rc)
     Seq_addhi(um->unmapped, (void *)(uintptr_t)um->registers[rc]);
 }
 
-/*
-* op_output
-* Performs the output operation
-* Writes the value in rc to to the I/O device
-* Arguments:
-*   - um - the UM struct with all register and segment information
-*   - rc - the Um_register to interpret as rc
-* Return: void
-*/
 static inline void op_output(UM um, Um_register rc)
 {
     // Print as unsigned char
     printf("%c", um->registers[rc]);
 }
 
-/*
-* op_input
-* Performs the input operation
-* Loads input from the I/O device into rc
-* Arguments:
-*   - um - the UM struct with all register and segment information
-*   - rc - the Um_register to interpret as rc
-* Return: void
-*/
 static inline void op_input(UM um, Um_register rc)
 {
     // Take input from stdin
@@ -281,16 +142,6 @@ static inline void op_input(UM um, Um_register rc)
     }
 }
 
-/*
-* op_load_program
-* Performs the load program operation
-* Duplicates the segment m[rb] and sets the program counter to m[0]rc
-* Arguments:
-*   - um - the UM struct with all register and segment information
-*   - rb - the Um_register to interpret as rb
-*   - rc - the Um_register to interpret as rc
-* Return: void
-*/
 static inline void op_load_program(UM um, Um_register rb, Um_register rc)
 {
     // Set the instructions counter
@@ -323,28 +174,10 @@ static inline void op_load_program(UM um, Um_register rb, Um_register rc)
     instructions_segment->words = new_words;
 }
 
-/*
-* op_load_value
-* performs the load_value operation
-* loads the value in ra
-* Arguments:
-*   - um - the UM struct with all register and segment information
-*   - ra - the Um_register to interpret as ra
-*   - value - the value you want to load
-* Return: void
-*/
 static inline void op_load_value(UM um, Um_register ra, uint32_t value)
 {
     um->registers[ra] = value;
 }
-
-/*
- * What makes things hellish is that C does not define the effects of
- * a 64-bit shift on a 64-bit value, and the Intel hardware computes
- * shifts mod 64, so that a 64-bit shift has the same effect as a
- * 0-bit shift.  The obvious workaround is to define new shift functions
- * that can shift by 64 bits.
- */
 
 Except_T Bitpack_Overflow = { "Overflow packing bits" };
 
@@ -357,9 +190,6 @@ static inline uint64_t shl(uint64_t word, unsigned bits)
                 return word << bits;
 }
 
-/*
- * shift R logical
- */
 static inline uint64_t shr(uint64_t word, unsigned bits)
 {
         assert(bits <= 64);
@@ -369,49 +199,10 @@ static inline uint64_t shr(uint64_t word, unsigned bits)
                 return word >> bits;
 }
 
-/*
- * shift R arith
- */
-static inline int64_t sra(uint64_t word, unsigned bits)
-{
-        assert(bits <= 64);
-        if (bits == 64)
-                bits = 63; /* will get all copies of sign bit,
-                            * which is correct for 64
-                            */
-	/* Warning: following uses non-portable >> on
-	   signed value...see K&R 2nd edition page 206. */
-        return ((int64_t) word) >> bits;
-}
-
-/****************************************************************/
-bool Bitpack_fitss( int64_t n, unsigned width)
-{
-        assert(width <= 64);
-        int64_t narrow = sra(shl(n, 64 - width),
-                             64 - width);
-        return narrow == n;
-}
-
 bool Bitpack_fitsu(uint64_t n, unsigned width)
 {
         assert(width <= 64);
-        /* thanks to Jai Karve and John Bryan  */
-        /* clever shortcut instead of 2 shifts */
         return shr(n, width) == 0;
-}
-
-/****************************************************************/
-
-int64_t Bitpack_gets(uint64_t word, unsigned width, unsigned lsb)
-{
-        assert(width <= 64);
-        if (width == 0) return 0;    /* avoid capturing unknown sign bit    */
-
-        unsigned hi = lsb + width; /* one beyond the most significant bit */
-        assert(hi <= 64);
-        return sra(shl(word, 64 - hi),
-                   64 - width);
 }
 
 static inline uint64_t Bitpack_getu(uint64_t word, unsigned width, unsigned lsb)
@@ -424,7 +215,6 @@ static inline uint64_t Bitpack_getu(uint64_t word, unsigned width, unsigned lsb)
                    64 - width);
 }
 
-/****************************************************************/
 uint64_t Bitpack_newu(uint64_t word, unsigned width, unsigned lsb,
                       uint64_t value)
 {
@@ -438,59 +228,6 @@ uint64_t Bitpack_newu(uint64_t word, unsigned width, unsigned lsb,
                 | (value << lsb);                     /* new part  */
 }
 
-uint64_t Bitpack_news(uint64_t word, unsigned width, unsigned lsb,
-                      int64_t value)
-{
-        assert(width <= 64);
-        if (!Bitpack_fitss(value, width))
-                RAISE(Bitpack_Overflow);
-        /* thanks to Michael Sackman and Gilad Gray */
-        return Bitpack_newu(word, width, lsb, Bitpack_getu(value, width, 0));
-}
-
-/*
-* Constant declarations
-*/
-#define SEGMENT_HINT 65536
-
-/*
-* Function declarations
-*/
-UM initialize_um ();
-void free_um (UM um_instance);
-void read_instructions (UM um, FILE *fp);
-void execute_instructions (UM um);
-
-/*
-* run_um
-* Driver function of the UM, creates a new UM emulator with the given
-* um instruction file, then executes the given instructions
-* Arguemnts:
-*   - file - file containing the initial UM instructions
-* Return: void
-*/
-void run_um (FILE *file) {
-
-    // Initialize a UM emulator
-    UM um_instance = initialize_um();
-
-    // Read in the initial instructions
-    read_instructions(um_instance, file);
-
-    // Loop through execution
-    execute_instructions(um_instance);
-
-    // Free the UM emulator
-    free_um(um_instance);
-}
-
-/*
-* intialize_um
-* Private helper function that initializes a UM struct with the correct
-* initial values
-* Arguments: None
-* Return: the newly malloc'd UM struct
-*/
 UM initialize_um () {
 
     // Malloc the struct
@@ -514,13 +251,6 @@ UM initialize_um () {
     return um_instance;
 }
 
-/*
-* read_instructions
-* Reads in the initial instructions of the program
-* Arguments:
-*   - fp - file pointer containing the initial UM instructions
-* Return: void
-*/
 void read_instructions (UM um, FILE *fp) {
 
     // Create sequence to hold the instructions
@@ -704,6 +434,23 @@ void free_um (UM um_instance) {
 
     // Delete UM struct
     free(um_instance);
+}
+
+
+
+void run_um (FILE *file) {
+
+    // Initialize a UM emulator
+    UM um_instance = initialize_um();
+
+    // Read in the initial instructions
+    read_instructions(um_instance, file);
+
+    // Loop through execution
+    execute_instructions(um_instance);
+
+    // Free the UM emulator
+    free_um(um_instance);
 }
 
 
