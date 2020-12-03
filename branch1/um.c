@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <seq.h>
 #include <assert.h>
 #include <except.h>
 #include <inttypes.h>
@@ -273,7 +272,6 @@ uint64_t Bitpack_newu(uint64_t word, unsigned width, unsigned lsb,
 
 void read_instructions (FILE *fp) {
 
-    Seq_T instructions = Seq_new(10000);
 
     while (true) {
         int c = fgetc(fp);
@@ -287,21 +285,25 @@ void read_instructions (FILE *fp) {
             int byte = fgetc(fp);
             word = Bitpack_newu(word, 8, i, byte);
         }
-        Seq_addhi(instructions, (void *)(uintptr_t)word);
+        unmapped_Dynamic_Array_ensure_size();
+        (unmapped.array)[unmapped.num_elements] = word;
+        unmapped.num_elements++;
     }
 
-    (segments.seg_array[0]).length = Seq_length(instructions);
-    uint32_t *words = malloc(UINT32_T_SIZE * Seq_length(instructions));
+    (segments.seg_array[0]).length = unmapped.num_elements;
+    uint32_t *words = malloc(UINT32_T_SIZE * unmapped.num_elements);
     assert(words != NULL);
     for (uint32_t i = 0; i < (segments.seg_array[0]).length; i++) {
-        words[i] = (uint32_t)(uintptr_t)Seq_get(instructions, i);
+        words[i] = unmapped.array[i];
     }
 
     (segments.seg_array[0]).words = words;
 
     segments.num_elements++;
-
-    Seq_free(&instructions);
+    
+    free(unmapped.array);
+    
+    unmapped_Dynamic_Array_init();
 }
 
 void execute_instructions () {
