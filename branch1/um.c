@@ -8,7 +8,7 @@
 #define UM_WORD_WIDTH 32
 #define MAX_VAL 4294967296
 #define NUM_REGISTERS 8
-#define SEGMENT_HINT 65536
+#define SEGMENT_HINT 10000
 
 typedef struct Segment {
     uint32_t length;

@@ -1,0 +1,3 @@
+Failed
+- reorder switch statements
+- Remove um struct altogether
