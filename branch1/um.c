@@ -51,8 +51,35 @@ static inline void Seg_Dynamic_Array_ensure_size() {
     segments.seg_array = new_seg_array;
 }
 
-static inline void Seg_Dynamic_Array_remove() {
-    segments.num_elements--;
+typedef struct unmapped_Dynamic_Array {
+    uint32_t num_elements;
+    uint32_t num_actual;
+    uint32_t *array;
+} unmapped_Dynamic_Array;
+
+unmapped_Dynamic_Array unmapped;
+
+static inline void unmapped_Dynamic_Array_init() {
+    unmapped.num_elements = 0;
+    unmapped.num_actual = SEGMENT_HINT;
+    unmapped.array = malloc(SEGMENT_HINT * UINT32_T_SIZE);
+}
+
+static inline void unmapped_Dynamic_Array_ensure_size() {
+    if (unmapped.num_elements < unmapped.num_actual) {
+        return;
+    }
+    uint32_t *new_array = malloc(unmapped.num_actual * 2 * UINT32_T_SIZE);
+    unmapped.num_actual *= 2;
+    for (uint32_t i = 0; i < unmapped.num_elements; i++) {
+        new_array[i] = unmapped.array[i];
+    }
+    free(unmapped.array);
+    unmapped.array = new_array;
+}
+
+static inline void unmapped_Dynamic_Array_remove() {
+    unmapped.num_elements--;
 }
 
 typedef uint32_t Um_instruction;
@@ -69,7 +96,6 @@ typedef enum Um_register {
 typedef struct UM {
     uint32_t registers [NUM_REGISTERS];
     uint32_t counter;
-    Seq_T unmapped;
 } UM;
 
 UM um;
@@ -90,7 +116,6 @@ static inline void op_segmented_load(Um_register ra, Um_register rb, Um_register
 static inline void op_segmented_store(Um_register ra, Um_register rb, Um_register rc)
 {
     ((segments.seg_array[um.registers[ra]]).words)[um.registers[rb]] = um.registers[rc];
-
 }
 
 static inline void op_addition(Um_register ra, Um_register rb, Um_register rc)
@@ -124,8 +149,9 @@ static inline void op_map_segment(Um_register rb, Um_register rc)
 
     uint32_t id;
 
-    if (Seq_length(um.unmapped) > 0){
-        id = (uint32_t)(uintptr_t)Seq_remlo(um.unmapped);
+    if (unmapped.num_elements > 0){
+        id = (unmapped.array)[unmapped.num_elements - 1];
+        unmapped_Dynamic_Array_remove();
     } else {
 
         Seg_Dynamic_Array_ensure_size();
@@ -145,8 +171,10 @@ static inline void op_unmap_segment(Um_register rc)
     free((segments.seg_array[um.registers[rc]]).words);
     (segments.seg_array[um.registers[rc]]).length = 0;
     (segments.seg_array[um.registers[rc]]).words = NULL;
-
-    Seq_addhi(um.unmapped, (void *)(uintptr_t)um.registers[rc]);
+    
+    unmapped_Dynamic_Array_ensure_size();
+    unmapped.array[unmapped.num_elements] = um.registers[rc];
+    unmapped.num_elements++;
 }
 
 static inline void op_output(Um_register rc)
@@ -381,22 +409,20 @@ void free_um () {
             free((segments.seg_array[i]).words);
         }
     }
-    Seq_free(&(um.unmapped));
+    free(unmapped.array);
     free(segments.seg_array);
 }
 
 void run_um (FILE *file) {
 
     Seg_Dynamic_Array_init();
+    unmapped_Dynamic_Array_init();
     
     um.counter = 0;
 
     for(int i = 0; i < NUM_REGISTERS; i++){
         um.registers[i] = 0;
     }
-
-    um.unmapped = Seq_new(SEGMENT_HINT);
-    assert(um.unmapped != NULL);
 
     read_instructions(file);
 
