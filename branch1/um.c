@@ -39,7 +39,6 @@ static inline void Seg_Dynamic_Array_ensure_size() {
         return;
     }
 
-    fprintf(stderr, "expanding");
     Segment *new_seg_array = malloc(segments.num_actual * 2 * SEGMENT_SIZE);
 
     segments.num_actual *= 2;
@@ -117,11 +116,9 @@ static inline void op_bitwise_NAND(Um_register ra, Um_register rb, Um_register r
 
 static inline void op_map_segment(Um_register rb, Um_register rc)
 {
-    // Allocate the memory for the segment
     uint32_t *real_memory = malloc(UINT32_T_SIZE * um.registers[rc]);
     assert(real_memory != NULL);
   
-    // Initialize each word to 0
     for (uint32_t i = 0; i < um.registers[rc]; i++) {
         real_memory[i] = 0;
     }
@@ -140,32 +137,26 @@ static inline void op_map_segment(Um_register rb, Um_register rc)
     (segments.seg_array[id]).words = real_memory;
     (segments.seg_array[id]).length = um.registers[rc];
 
-
     um.registers[rb] = id;
 
-    // fprintf(stderr, "INITIAL VALUE: %u\n", segments.seg_array[id].words[0]);
 }
 
 static inline void op_unmap_segment(Um_register rc)
 {
-    // Free the segment memory
     free((segments.seg_array[um.registers[rc]]).words);
     (segments.seg_array[um.registers[rc]]).length = 0;
     (segments.seg_array[um.registers[rc]]).words = NULL;
 
-    // Add the id to unmapped
     Seq_addhi(um.unmapped, (void *)(uintptr_t)um.registers[rc]);
 }
 
 static inline void op_output(Um_register rc)
 {
-    // Print as unsigned char
     printf("%c", um.registers[rc]);
 }
 
 static inline void op_input(Um_register rc)
 {
-    // Take input from stdin
     int input = getc(stdin);
     if (input == -1) {
         uint32_t value = 0;
@@ -178,10 +169,8 @@ static inline void op_input(Um_register rc)
 
 static inline void op_load_program(Um_register rb, Um_register rc)
 {
-    // Set the instructions counter
     um.counter = um.registers[rc];
-
-    // Check the loaded program is not m[0]
+    
     if (um.registers[rb] == 0) {
         return;
     }
@@ -193,14 +182,11 @@ static inline void op_load_program(Um_register rb, Um_register rc)
 
     uint32_t *new_words = malloc(load_from.length * UINT32_T_SIZE);
     assert(new_words != NULL);
-
-    // Copy words in the segment
-
+    
     for (uint32_t i = 0; i < load_from.length; i++)  {
         new_words[i] = (load_from.words)[i];
     }
 
-    // Update instructions segments fields
     (segments.seg_array[0]).length = load_from.length;
     (segments.seg_array[0]).words = new_words;
 }
@@ -239,9 +225,8 @@ bool Bitpack_fitsu(uint64_t n, unsigned width)
 static inline uint64_t Bitpack_getu(uint64_t word, unsigned width, unsigned lsb)
 {
         assert(width <= 64);
-        unsigned hi = lsb + width; /* one beyond the most significant bit */
+        unsigned hi = lsb + width;
         assert(hi <= 64);
-        /* different type of right shift */
         return shr(shl(word, 64 - hi),
                    64 - width);
 }
@@ -250,30 +235,26 @@ uint64_t Bitpack_newu(uint64_t word, unsigned width, unsigned lsb,
                       uint64_t value)
 {
         assert(width <= 64);
-        unsigned hi = lsb + width; /* one beyond the most significant bit */
+        unsigned hi = lsb + width;
         assert(hi <= 64);
         if (!Bitpack_fitsu(value, width))
                 RAISE(Bitpack_Overflow);
-        return shl(shr(word, hi), hi)                 /* high part */
-                | shr(shl(word, 64 - lsb), 64 - lsb)  /* low part  */
-                | (value << lsb);                     /* new part  */
+        return shl(shr(word, hi), hi)
+                | shr(shl(word, 64 - lsb), 64 - lsb)
+                | (value << lsb);
 }
 
 void read_instructions (FILE *fp) {
 
-    // Create sequence to hold the instructions
     Seq_T instructions = Seq_new(10000);
 
-    // Read in the instructions, bitpack them, add them to the sequence
     while (true) {
-        // EOF: break
         int c = fgetc(fp);
         if (c == -1) {
             break;
         } else {
             ungetc(c, fp);
         }
-        // Read and bitpack the word
         Um_instruction word = 0;
         for (int i = 24; i >= 0 ; i -= 8) {
             int byte = fgetc(fp);
@@ -282,13 +263,9 @@ void read_instructions (FILE *fp) {
         Seq_addhi(instructions, (void *)(uintptr_t)word);
     }
 
-    // Create segment representing the program
     (segments.seg_array[0]).length = Seq_length(instructions);
-
-    // Create words array with length of sequence
     uint32_t *words = malloc(UINT32_T_SIZE * Seq_length(instructions));
     assert(words != NULL);
-    // Copy the values in the sequence to the words array
     for (uint32_t i = 0; i < (segments.seg_array[0]).length; i++) {
         words[i] = (uint32_t)(uintptr_t)Seq_get(instructions, i);
     }
@@ -311,17 +288,12 @@ void execute_instructions () {
     int opcode = -1;
     bool doLoop = true;
 
-    // Loop through each instruction
     while (doLoop) {
 
-        // Retrieve the current instruction
         cur_instruction = instructions[um.counter];
 
-        // Retrieve the opcode
         opcode = Bitpack_getu(cur_instruction, 4, 28);
-
-
-        // Execute the corresponding instruction
+        
         switch(opcode){
           case CMOV:
               ra = Bitpack_getu(cur_instruction, 3, 6);
@@ -415,13 +387,10 @@ void free_um () {
 
 void run_um (FILE *file) {
 
-
     Seg_Dynamic_Array_init();
-
-    // Instruction counter
+    
     um.counter = 0;
 
-    // Array for registers
     for(int i = 0; i < NUM_REGISTERS; i++){
         um.registers[i] = 0;
     }
@@ -429,19 +398,15 @@ void run_um (FILE *file) {
     um.unmapped = Seq_new(SEGMENT_HINT);
     assert(um.unmapped != NULL);
 
-    // Read in the initial instructions
     read_instructions(file);
 
-    // Loop through execution
     execute_instructions();
 
-    // Free the UM emulator
     free_um();
 }
 
 int main(int argc, char **argv)
 {
-    // Open the file
     if (argc != 2) {
         exit(EXIT_FAILURE);
     }
@@ -449,10 +414,8 @@ int main(int argc, char **argv)
     if (fp == NULL) {
         exit(EXIT_FAILURE);
     }
-
-    // Create and run a UM emulator
+    
     run_um(fp);
 
-    // Close the file
     fclose(fp);
 }
