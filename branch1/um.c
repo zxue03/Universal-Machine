@@ -138,7 +138,7 @@ static inline void op_map_segment(Um_register rb, Um_register rc)
 {
     uint32_t *real_memory = malloc(UINT32_T_SIZE * um.registers[rc]);
     assert(real_memory != NULL);
-  
+
     for (uint32_t i = 0; i < um.registers[rc]; i++) {
         real_memory[i] = 0;
     }
@@ -167,7 +167,7 @@ static inline void op_unmap_segment(Um_register rc)
     free((segments.seg_array[um.registers[rc]]).words);
     (segments.seg_array[um.registers[rc]]).length = 0;
     (segments.seg_array[um.registers[rc]]).words = NULL;
-    
+
     unmapped_Dynamic_Array_ensure_size();
     unmapped.array[unmapped.num_elements] = um.registers[rc];
     unmapped.num_elements++;
@@ -193,7 +193,7 @@ static inline void op_input(Um_register rc)
 static inline void op_load_program(Um_register rb, Um_register rc)
 {
     um.counter = um.registers[rc];
-    
+
     if (um.registers[rb] == 0) {
         return;
     }
@@ -205,7 +205,7 @@ static inline void op_load_program(Um_register rb, Um_register rc)
 
     uint32_t *new_words = malloc(load_from.length * UINT32_T_SIZE);
     assert(new_words != NULL);
-    
+
     for (uint32_t i = 0; i < load_from.length; i++)  {
         new_words[i] = (load_from.words)[i];
     }
@@ -221,49 +221,40 @@ static inline void op_load_value(Um_register ra, uint32_t value)
 
 Except_T Bitpack_Overflow = { "Overflow packing bits" };
 
-static inline uint64_t shl(uint64_t word, unsigned bits)
+static inline uint32_t shl(uint32_t word, unsigned bits)
 {
-        assert(bits <= 64);
-        if (bits == 64)
+        if (bits == 32)
                 return 0;
         else
                 return word << bits;
 }
 
-static inline uint64_t shr(uint64_t word, unsigned bits)
+static inline uint32_t shr(uint32_t word, unsigned bits)
 {
-        assert(bits <= 64);
-        if (bits == 64)
+        if (bits == 32)
                 return 0;
         else
                 return word >> bits;
 }
 
-bool Bitpack_fitsu(uint64_t n, unsigned width)
+bool Bitpack_fitsu(uint32_t n, unsigned width)
 {
-        assert(width <= 64);
         return shr(n, width) == 0;
 }
 
-static inline uint64_t Bitpack_getu(uint64_t word, unsigned width, unsigned lsb)
+static inline uint32_t Bitpack_getu(uint32_t word, unsigned width, unsigned lsb)
 {
-        assert(width <= 64);
         unsigned hi = lsb + width;
-        assert(hi <= 64);
-        return shr(shl(word, 64 - hi),
-                   64 - width);
+        return shr(shl(word, 32 - hi),
+                   32 - width);
 }
 
-uint64_t Bitpack_newu(uint64_t word, unsigned width, unsigned lsb,
-                      uint64_t value)
+uint32_t Bitpack_newu(uint32_t word, unsigned width, unsigned lsb,
+                      uint32_t value)
 {
-        assert(width <= 64);
         unsigned hi = lsb + width;
-        assert(hi <= 64);
-        if (!Bitpack_fitsu(value, width))
-                RAISE(Bitpack_Overflow);
         return shl(shr(word, hi), hi)
-                | shr(shl(word, 64 - lsb), 64 - lsb)
+                | shr(shl(word, 32 - lsb), 32 - lsb)
                 | (value << lsb);
 }
 
@@ -300,9 +291,9 @@ void read_instructions (FILE *fp) {
     (segments.seg_array[0]).words = words;
 
     segments.num_elements++;
-    
+
     free(unmapped.array);
-    
+
     unmapped_Dynamic_Array_init();
 }
 
@@ -322,7 +313,7 @@ void execute_instructions () {
         cur_instruction = instructions[um.counter];
 
         opcode = Bitpack_getu(cur_instruction, 4, 28);
-        
+
         switch(opcode){
           case CMOV:
               ra = Bitpack_getu(cur_instruction, 3, 6);
@@ -419,7 +410,7 @@ void run_um (FILE *file) {
 
     Seg_Dynamic_Array_init();
     unmapped_Dynamic_Array_init();
-    
+
     um.counter = 0;
 
     for(int i = 0; i < NUM_REGISTERS; i++){
@@ -442,7 +433,7 @@ int main(int argc, char **argv)
     if (fp == NULL) {
         exit(EXIT_FAILURE);
     }
-    
+
     run_um(fp);
 
     fclose(fp);

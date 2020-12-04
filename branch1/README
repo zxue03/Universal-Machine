@@ -1,0 +1,38 @@
+# README
+## Authors
+Kevin Gao (kgao03) and Zhicheng Xue (zxue03)
+
+## Acknowledgements
+* We'd like to thank the TAs for pointing us to the right direction of
+improving our um.
+* We made use of the Bitpack interface made by Comp40 staff
+
+## Analysis of Hotspot Assembly Code
+- In our final submission, most operations and Bitpack operations are made
+inline, but for the sake of finding the hotspot, we removed the static inline
+keyword temporally.
+- Identified hotspots using kcachegrind to be Bitpack_getu - taking up roughly
+80% of the total run time.
+- Analyzed callers and callees
+- Looked at assembly code, realized there are a lot of conditionals and jump
+statements and move statements that take up the majority of the time
+- Traced the jump statements back to asserts and shl/shr.
+- The conditional jumps in shl/shr are in fact optimizing the operations by
+making the least number of bit shifts.
+- Conclusion: this section of the code, although a hotspot, should not be
+changed because 1) without the assert statements, we don't have the
+necessary safeguards and thus would not have a complete program and
+2) the shl/shr if check for edge cases that actually reduce the average runtime
+and thus the total instructions even though the function is longer.
+3) We've minimized the number of times that we execute Bitpack_getu - we only
+unbitpack the necessary parts for a given operation.
+
+## Time Spent
+Analyzing
+* _ HRS
+
+Solving
+* _ HRS
+
+Total
+* _ HRS

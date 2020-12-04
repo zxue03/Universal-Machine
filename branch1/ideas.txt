@@ -1,3 +1,1 @@
-Failed
-- reorder switch statements
-- Remove um struct altogether
+we can remove check statement in shl and shr.
