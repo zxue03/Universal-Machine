@@ -104,14 +104,18 @@ static inline void op_conditional_move(Um_register ra, Um_register rb,
     }
 }
 
-static inline void op_segmented_load(Um_register ra, Um_register rb, Um_register rc)
+static inline void op_segmented_load(Um_register ra, Um_register rb,
+                                                            Um_register rc)
 {
-    um.registers[ra] = ((segments.seg_array[um.registers[rb]]).words)[um.registers[rc]];
+  um.registers[ra] =
+  ((segments.seg_array[um.registers[rb]]).words)[um.registers[rc]];
 }
 
-static inline void op_segmented_store(Um_register ra, Um_register rb, Um_register rc)
+static inline void op_segmented_store(Um_register ra, Um_register rb,
+                                                            Um_register rc)
 {
-    ((segments.seg_array[um.registers[ra]]).words)[um.registers[rb]] = um.registers[rc];
+    ((segments.seg_array[um.registers[ra]]).words)[um.registers[rb]] =
+    um.registers[rc];
 }
 
 static inline void op_addition(Um_register ra, Um_register rb, Um_register rc)
@@ -119,7 +123,8 @@ static inline void op_addition(Um_register ra, Um_register rb, Um_register rc)
     um.registers[ra] = (um.registers[rb] + um.registers[rc]) % MAX_VAL;
 }
 
-static inline void op_multiplication(Um_register ra, Um_register rb, Um_register rc)
+static inline void op_multiplication(Um_register ra, Um_register rb,
+                                                              Um_register rc)
 {
       um.registers[ra] = (um.registers[rb] * um.registers[rc]) % MAX_VAL;
 }
@@ -129,7 +134,8 @@ static inline void op_division(Um_register ra, Um_register rb, Um_register rc)
       um.registers[ra] = um.registers[rb] / um.registers[rc];
 }
 
-static inline void op_bitwise_NAND(Um_register ra, Um_register rb, Um_register rc)
+static inline void op_bitwise_NAND(Um_register ra, Um_register rb,
+                                                              Um_register rc)
 {
       um.registers[ra] = ~(um.registers[rb] & um.registers[rc]);
 }

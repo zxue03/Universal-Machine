@@ -1,1 +1,0 @@
-we can remove check statement in shl and shr.
