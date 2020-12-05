@@ -14,19 +14,24 @@ keyword temporally.
 - Identified hotspots using kcachegrind to be Bitpack_getu - taking up roughly
 80% of the total run time.
 - Analyzed callers and callees
-- Looked at assembly code, realized there are a lot of conditionals and jump
-statements and move statements that take up the majority of the time
-- Traced the jump statements back to asserts and shl/shr.
+- Looked at assembly code, realized there are some conditionals and many
+move statements (conditional and non-conditional) that take up the majority
+of the time
+- Data manipulations are all done inside of the registers - there's no
+main memory access at all
+- Traced the comparisons statements back to asserts and shl/shr.
 - The conditional jumps in shl/shr are in fact optimizing the operations by
 making the least number of bit shifts.
 - Conclusion: this section of the code, although a hotspot, should not be
-changed because 1) without the assert statements, we don't have the
+changed because
+1) data is kept in registers entirely, no memory access or loop
+2) without the assert statements, we don't have the
 necessary safeguards and thus would not have a complete program and
-2) the shl/shr if check for edge cases that actually reduce the average runtime
+3) the shl/shr if check for edge cases that actually reduce the average runtime
 and thus the total instructions even though the function is longer.
-3) the number of times that we execute Bitpack_getu has been minimized - we only
+4) the number of times that we execute Bitpack_getu has been minimized - we only
 unbitpack the necessary parts for a given operation.
-4) it's already slightly tweaked by us by changing the uint_64 to uint_32 (um
+5) it's already slightly tweaked by us by changing the uint_64 to uint_32 (um
 deals with 32-bit words).
 
 ## Time Spent

@@ -29,4 +29,4 @@ um: um.o
 	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 
 clean:
-	rm -f um op *.o *.um *.1 *.0
+	rm -f um op *.o *.1 *.0
