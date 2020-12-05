@@ -24,8 +24,10 @@ changed because 1) without the assert statements, we don't have the
 necessary safeguards and thus would not have a complete program and
 2) the shl/shr if check for edge cases that actually reduce the average runtime
 and thus the total instructions even though the function is longer.
-3) We've minimized the number of times that we execute Bitpack_getu - we only
+3) the number of times that we execute Bitpack_getu has been minimized - we only
 unbitpack the necessary parts for a given operation.
+4) it's already slightly tweaked by us by changing the uint_64 to uint_32 (um
+deals with 32-bit words).
 
 ## Time Spent
 Analyzing
